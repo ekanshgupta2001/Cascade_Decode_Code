@@ -98,6 +98,14 @@ public class movementTest extends OpMode {
                     true
             );
         }
+        if (gamepad1.dpadRightWasPressed() && adjustSpeed >= 1.0) {
+            adjustSpeed += 0.2;
+        }
+
+        //Optional way to change slow mode strength
+        if (gamepad2.dpadLeftWasPressed()) {
+            adjustSpeed -= 0.2;
+        }
     }
 
 }
