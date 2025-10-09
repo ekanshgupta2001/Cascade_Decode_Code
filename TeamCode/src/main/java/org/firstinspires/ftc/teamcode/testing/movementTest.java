@@ -70,6 +70,7 @@ public class movementTest extends OpMode {
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
         telemetry.update();
+        telemetryM.update();
     }
 
     public void movement(){
