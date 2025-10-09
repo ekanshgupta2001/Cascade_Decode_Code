@@ -54,6 +54,7 @@ public class movementTest extends OpMode {
     @Override
     public void start(){
         loop();
+        follower.startTeleopDrive();
     }
 
     @Override
