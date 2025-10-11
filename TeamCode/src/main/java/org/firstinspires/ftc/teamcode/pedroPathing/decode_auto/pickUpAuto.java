@@ -9,6 +9,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.util.Timer;
@@ -23,7 +24,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.List;
 
 @Autonomous(name = "Pickup Auto", group = "Pedro")
-public class pickUpAuto extends LinearOpMode {
+public class pickUpAuto extends OpMode {
 
     private Follower follower;
 
@@ -43,6 +44,7 @@ public class pickUpAuto extends LinearOpMode {
 
     private Limelight3A limelight;
     private int pathState;
+    private final Pose startPose = new Pose(0, 0, Math.toRadians(0));
     private final Pose moveToBalls = new Pose(25, 111, Math.toRadians(-90));
     private final Pose pickUpBalls = new Pose(25, 130, Math.toRadians(-90));
     private final Pose scorePose = new Pose(5, 130, Math.toRadians(-135));
@@ -52,11 +54,86 @@ public class pickUpAuto extends LinearOpMode {
     private final Pose parkPose = new Pose(100, 111, Math.toRadians(-180));
 
 
-    private PathChain move, scorePath, moveAgain, pickUpAgain, scoreAgain, parkPath;
+    private PathChain firstMove, move, scorePath, moveAgain, pickUpAgain, scoreAgain, parkPath;
 
     @Override
-    public void runOpMode() {
+    public void start() {
+        opmodeTimer.resetTimer();
+        setPathState(0);
+
+    }
+
+    public void setPathState(int pState) {
+        pathState = pState;
+        pathTimer.resetTimer();
+    }
+
+    public void buildPaths() {
+        firstMove = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, moveToBalls))
+                .setLinearHeadingInterpolation(startPose.getHeading(), moveToBalls.getHeading())
+                .build();
+
+        move = follower.pathBuilder()
+                .addPath(new BezierLine(moveToBalls, pickUpBalls))
+                .setLinearHeadingInterpolation(moveToBalls.getHeading(), pickUpBalls.getHeading())
+                .build();
+
+        scorePath = follower.pathBuilder()
+                .addPath(new BezierLine(pickUpBalls, scorePose))
+                .setLinearHeadingInterpolation(pickUpBalls.getHeading(), scorePose.getHeading())
+                .build();
+
+        moveAgain = follower.pathBuilder()
+                .addPath(new BezierLine(scorePose, movePose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), movePose.getHeading())
+                .build();
+
+        pickUpAgain = follower.pathBuilder()
+                .addPath(new BezierLine(movePose, pickupPose))
+                .setLinearHeadingInterpolation(movePose.getHeading(), pickupPose.getHeading())
+                .build();
+
+        scoreAgain = follower.pathBuilder()
+                .addPath(new BezierLine(pickupPose, score))
+                .setLinearHeadingInterpolation(pickupPose.getHeading(), score.getHeading())
+                .build();
+
+        parkPath = follower.pathBuilder()
+                .addPath(new BezierLine(score, parkPose))
+                .setLinearHeadingInterpolation(score.getHeading(), parkPose.getHeading())
+                .build();
+
+        follower.followPath(move);
+    }
+    public void autonomousPathUpdate() {
+        switch (pathState) {
+            case 0:
+                follower.followPath(firstMove);
+                break;
+            case 1:
+                if (!follower.isBusy()){
+                    follower.followPath(move);
+                }
+                break;
+
+            case 2:
+                if (!follower.isBusy()){
+                    follower.followPath(scorePath);
+                    if (pathTimer.getElapsedTime() > 2.5){
+                        intakeMotorL.setPower(1.0);
+                        intakeMotorR.setPower(1.0);
+                    }
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void init() {
         follower = Constants.createFollower(hardwareMap);
+        buildPaths();
+        follower.setStartingPose(startPose);
 
         slideMotor = hardwareMap.get(DcMotor.class, "Slide Motor");
         slideMotor.setDirection(DcMotor.Direction.FORWARD);
@@ -87,64 +164,9 @@ public class pickUpAuto extends LinearOpMode {
         telemetry.update();
     }
 
-    public void buildPaths() {
-        move = follower.pathBuilder()
-                .addPath(new BezierLine(moveToBalls, pickUpBalls))
-                .setLinearHeadingInterpolation(moveToBalls.getHeading(), pickUpBalls.getHeading())
-                .addPath(new BezierLine(moveToBalls, pickUpBalls))
-                .setLinearHeadingInterpolation(moveToBalls.getHeading(), pickUpBalls.getHeading())
-                .build();
-
-        scorePath = follower.pathBuilder()
-                .addPath(new BezierLine(pickUpBalls, scorePose))
-                .setLinearHeadingInterpolation(pickUpBalls.getHeading(), scorePose.getHeading())
-                .addPath(new BezierLine(pickUpBalls, scorePose))
-                .setLinearHeadingInterpolation(pickUpBalls.getHeading(), scorePose.getHeading())
-                .build();
-
-        moveAgain = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, movePose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), movePose.getHeading())
-                .addPath(new BezierLine(scorePose, movePose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), movePose.getHeading())
-                .build();
-
-        pickUpAgain = follower.pathBuilder()
-                .addPath(new BezierLine(movePose, pickupPose))
-                .setLinearHeadingInterpolation(movePose.getHeading(), pickupPose.getHeading())
-                .addPath(new BezierLine(movePose, pickupPose))
-                .setLinearHeadingInterpolation(movePose.getHeading(), pickupPose.getHeading())
-                .build();
-
-        scoreAgain = follower.pathBuilder()
-                .addPath(new BezierLine(pickupPose, score))
-                .setLinearHeadingInterpolation(pickupPose.getHeading(), score.getHeading())
-                .addPath(new BezierLine(pickupPose, score))
-                .setLinearHeadingInterpolation(pickupPose.getHeading(), score.getHeading())
-                .build();
-
-        parkPath = follower.pathBuilder()
-                .addPath(new BezierLine(score, parkPose))
-                .setLinearHeadingInterpolation(score.getHeading(), parkPose.getHeading())
-                .addPath(new BezierLine(score, parkPose))
-                .setLinearHeadingInterpolation(score.getHeading(), parkPose.getHeading())
-                .build();
-
-        follower.followPath(move);
+    @Override
+    public void loop() {
+        follower.update();
+        autonomousPathUpdate();
     }
-    public void autonomousPathUpdate() {
-        switch (pathState) {
-            case 0:
-                follower.followPath(move);
-                break;
-
-            case 1:
-                follower.followPath(scorePath);
-                if (pathTimer.getElapsedTime() > 2.5){
-                    intakeMotorL.setPower(1.0);
-                    intakeMotorR.setPower(1.0);
-                }
-        }
-    }
-
 }

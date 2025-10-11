@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.util.Timer;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -23,7 +24,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.List;
 
 @Autonomous(name = "Observation Zone Auto", group = "Pedro")
-public class observationAuto extends LinearOpMode {
+public class observationAuto extends OpMode {
 
     private Follower follower;
 
@@ -55,34 +56,9 @@ public class observationAuto extends LinearOpMode {
     private PathChain move, observationPickup, moveAgain, observationPickuptwo;
 
     @Override
-    public void runOpMode() {
-        follower = Constants.createFollower(hardwareMap);
-
-        rfMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        lfMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        rrMotor = hardwareMap.dcMotor.get("backRightMotor");
-        lrMotor = hardwareMap.dcMotor.get("backLeftMotor");
-
-        rotateL = hardwareMap.get(CRServo.class, "rotateIntakeLeft");
-        rotateR = hardwareMap.get(CRServo.class, "rotateIntakeRight");
-        rotateL.setDirection(CRServo.Direction.FORWARD);
-        rotateR.setDirection(CRServo.Direction.FORWARD);
-
-        intakeMotorL = hardwareMap.get(CRServo.class, "intakeMotorLeft");
-        intakeMotorR = hardwareMap.get(CRServo.class, "intakeMotorRight");
-        intakeMotorL.setDirection(CRServo.Direction.FORWARD);
-        intakeMotorR.setDirection(CRServo.Direction.FORWARD);
-
-        parallelEncoder = hardwareMap.get(DcMotorEx.class, "parallelEncoder");
-        perpendicularEncoder = hardwareMap.get(DcMotorEx.class, "perpendicularEncoder");
-
-        pathTimer = new Timer();
-        actionTimer = new Timer();
-        opmodeTimer = new Timer();
+    public void start() {
         opmodeTimer.resetTimer();
-
-        telemetry.addLine("Auto complete");
-        telemetry.update();
+        setPathState(0);
     }
 
     public void buildPaths() {
@@ -145,5 +121,42 @@ public class observationAuto extends LinearOpMode {
     public void setPathState(int pState) {
         pathState = pState;
         pathTimer.resetTimer();
+    }
+
+    @Override
+    public void init() {
+        follower = Constants.createFollower(hardwareMap);
+
+        rfMotor = hardwareMap.dcMotor.get("frontRightMotor");
+        lfMotor = hardwareMap.dcMotor.get("frontLeftMotor");
+        rrMotor = hardwareMap.dcMotor.get("backRightMotor");
+        lrMotor = hardwareMap.dcMotor.get("backLeftMotor");
+
+        rotateL = hardwareMap.get(CRServo.class, "rotateIntakeLeft");
+        rotateR = hardwareMap.get(CRServo.class, "rotateIntakeRight");
+        rotateL.setDirection(CRServo.Direction.FORWARD);
+        rotateR.setDirection(CRServo.Direction.FORWARD);
+
+        intakeMotorL = hardwareMap.get(CRServo.class, "intakeMotorLeft");
+        intakeMotorR = hardwareMap.get(CRServo.class, "intakeMotorRight");
+        intakeMotorL.setDirection(CRServo.Direction.FORWARD);
+        intakeMotorR.setDirection(CRServo.Direction.FORWARD);
+
+        parallelEncoder = hardwareMap.get(DcMotorEx.class, "parallelEncoder");
+        perpendicularEncoder = hardwareMap.get(DcMotorEx.class, "perpendicularEncoder");
+
+        pathTimer = new Timer();
+        actionTimer = new Timer();
+        opmodeTimer = new Timer();
+        opmodeTimer.resetTimer();
+
+        telemetry.addLine("Auto complete");
+        telemetry.update();
+    }
+
+    @Override
+    public void loop() {
+        follower.update();
+        autonomousPathUpdate();
     }
 }

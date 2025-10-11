@@ -1,69 +1,68 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.decode_teleop;
 
+import static java.lang.Math.tan;
+
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.util.Timer;
+
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 public class mediumScore extends OpMode {
-    private Follower follower;
-    private Timer pathTimer, actionTimer, opmodeTimer;
 
-    private DcMotor slideMotor;
-    private DcMotor armMotor;
+    private Follower follower;
+    private int pathState;
+    private Timer pathTimer, actionTimer, opmodeTimer;
     private DcMotor lfMotor = null;
     private DcMotor lrMotor = null;
     private DcMotor rfMotor = null;
     private DcMotor rrMotor = null;
-    private final ElapsedTime runtime = new ElapsedTime();
-    private final ElapsedTime sequenceTimer = new ElapsedTime();
-    private final ElapsedTime sampleTimer = new ElapsedTime();
-    private DcMotor rotateRampMotor;
-    private DcMotor scoreMotorL;
-    private DcMotor scoreMotorR;
-    private DcMotor intakeMotorL;
-    private DcMotor intakeMotorR;
-    private CRServo scoreIntakeL;
-    private CRServo scoreIntakeR;
-
-    private Limelight3A limelight;
-
+    private DcMotor scoreMotor = null;
+    private DcMotor intakeMotor = null;
+    private Servo adjustHood = null;
+    private TelemetryManager telemetryM;
+    private DcMotorEx parallelEncoder;
+    private DcMotorEx perpendicularEncoder;
     @Override
     public void init() {
 
         follower = Constants.createFollower(hardwareMap);
 
-        slideMotor = hardwareMap.get(DcMotor.class, "Slide Motor");
-        slideMotor.setDirection(DcMotor.Direction.FORWARD);
-        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rfMotor = hardwareMap.dcMotor.get("frontRightMotor");
+        lfMotor = hardwareMap.dcMotor.get("frontLeftMotor");
+        rrMotor = hardwareMap.dcMotor.get("backRightMotor");
+        lrMotor = hardwareMap.dcMotor.get("backLeftMotor");
 
-        armMotor = hardwareMap.get(DcMotor.class, "Arm Motor");
-        armMotor.setDirection(DcMotor.Direction.FORWARD);
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeMotor = hardwareMap.get(DcMotor.class, "IM");
+        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        intakeMotorL = hardwareMap.get(DcMotor.class, "intakeMotorLeft");
-        intakeMotorR = hardwareMap.get(DcMotor.class, "intakeMotorRight");
-        intakeMotorL.setDirection(DcMotor.Direction.FORWARD);
-        intakeMotorR.setDirection(DcMotor.Direction.FORWARD);
+        scoreMotor = hardwareMap.get(DcMotor.class, "ScoreMotor");
+        scoreMotor.setDirection(DcMotor.Direction.FORWARD);
 
-        rotateRampMotor = hardwareMap.get(DcMotor.class, "RotateRampMotor");
+        parallelEncoder = hardwareMap.get(DcMotorEx.class, "parallelEncoder");
+        perpendicularEncoder = hardwareMap.get(DcMotorEx.class, "perpendicularEncoder");
 
-        scoreIntakeL = hardwareMap.get(CRServo.class, "IntakeShooterLeft");
-        scoreIntakeR = hardwareMap.get(CRServo.class, "IntakeShooterRight");
+        adjustHood = hardwareMap.get(Servo.class, "AH");
 
-        scoreMotorL = hardwareMap.get(DcMotor.class, "ScoreMotorLeft");
-        scoreMotorL.setDirection(DcMotor.Direction.REVERSE);
-        scoreMotorR = hardwareMap.get(DcMotor.class, "ScoreMotorRight");
-        scoreMotorR.setDirection(DcMotor.Direction.FORWARD);
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         pathTimer = new Timer();
         actionTimer = new Timer();
@@ -72,29 +71,24 @@ public class mediumScore extends OpMode {
 
         telemetry.addLine("Auto complete");
         telemetry.update();
-
     }
 
     @Override
     public void loop() {
-        rotateRampPosition(900, 0.8);
-        shoot(2500, 0.85, 1.0);
+        follower.update();
+        autonomousPathUpdate();
     }
 
-    public void rotateRampPosition(int position, double power) {
-        rotateRampMotor.setTargetPosition(position);
-        rotateRampMotor.setPower(power);
-        rotateRampMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
+    public void autonomousPathUpdate() {
+        switch (pathState) {
+            case 0:
+                adjustHood.setPosition(0.2);
+                break;
 
-    public void shoot(long time, double power, double servoPower){
-        if (pathTimer.getElapsedTime() > time){
-            scoreIntakeL.setPower(servoPower);
-            scoreIntakeR.setPower(-servoPower);
-
-            scoreMotorL.setPower(power);
-            scoreMotorR.setPower(power);
-
+            case 1:
+                if (!follower.isBusy()){
+                    scoreMotor.setPower(1.0);
+                }
         }
     }
 

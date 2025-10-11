@@ -1,42 +1,46 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.decode_auto;
 
+import static java.lang.Math.tan;
+
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.util.Timer;
+
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 public class observationMacro extends OpMode {
+
     private Follower follower;
+    private int pathState;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private DcMotor lfMotor = null;
     private DcMotor lrMotor = null;
     private DcMotor rfMotor = null;
     private DcMotor rrMotor = null;
-    private final ElapsedTime runtime = new ElapsedTime();
-    private final ElapsedTime sequenceTimer = new ElapsedTime();
-    private final ElapsedTime sampleTimer = new ElapsedTime();
-    private CRServo intakeMotorL;
-    private CRServo intakeMotorR;
-    private CRServo rotateL;
-    private CRServo rotateR;
+    private DcMotor scoreMotor = null;
+    private DcMotor intakeMotor = null;
+    private Servo adjustHood = null;
+    private TelemetryManager telemetryM;
     private DcMotorEx parallelEncoder;
     private DcMotorEx perpendicularEncoder;
-    private DcMotor rotateRampMotor;
-    private DcMotor scoreMotorL;
-    private DcMotor scoreMotorR;
-    private CRServo scoreIntakeL;
-    private CRServo scoreIntakeR;
-
-    private Limelight3A limelight;
-
     @Override
     public void init() {
 
@@ -47,18 +51,18 @@ public class observationMacro extends OpMode {
         rrMotor = hardwareMap.dcMotor.get("backRightMotor");
         lrMotor = hardwareMap.dcMotor.get("backLeftMotor");
 
-        rotateL = hardwareMap.get(CRServo.class, "rotateIntakeLeft");
-        rotateR = hardwareMap.get(CRServo.class, "rotateIntakeRight");
-        rotateL.setDirection(CRServo.Direction.FORWARD);
-        rotateR.setDirection(CRServo.Direction.FORWARD);
+        intakeMotor = hardwareMap.get(DcMotor.class, "IM");
+        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        intakeMotorL = hardwareMap.get(CRServo.class, "intakeMotorLeft");
-        intakeMotorR = hardwareMap.get(CRServo.class, "intakeMotorRight");
-        intakeMotorL.setDirection(CRServo.Direction.FORWARD);
-        intakeMotorR.setDirection(CRServo.Direction.FORWARD);
+        scoreMotor = hardwareMap.get(DcMotor.class, "ScoreMotor");
+        scoreMotor.setDirection(DcMotor.Direction.FORWARD);
 
         parallelEncoder = hardwareMap.get(DcMotorEx.class, "parallelEncoder");
         perpendicularEncoder = hardwareMap.get(DcMotorEx.class, "perpendicularEncoder");
+
+        adjustHood = hardwareMap.get(Servo.class, "AH");
+
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         pathTimer = new Timer();
         actionTimer = new Timer();
@@ -67,29 +71,24 @@ public class observationMacro extends OpMode {
 
         telemetry.addLine("Auto complete");
         telemetry.update();
-
     }
 
     @Override
     public void loop() {
-        rotateRampPosition(250, 0.8);
-        shoot(2500, 1.0, 1.0);
+        follower.update();
+        autonomousPathUpdate();
     }
 
-    public void rotateRampPosition(int position, double power) {
-        rotateRampMotor.setTargetPosition(position);
-        rotateRampMotor.setPower(power);
-        rotateRampMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
+    public void autonomousPathUpdate() {
+        switch (pathState) {
+            case 0:
+                adjustHood.setPosition(0.5);
+                break;
 
-    public void shoot(long time, double power, double servoPower){
-        if (pathTimer.getElapsedTime() > time){
-            scoreIntakeL.setPower(servoPower);
-            scoreIntakeR.setPower(-servoPower);
-
-            scoreMotorL.setPower(power);
-            scoreMotorR.setPower(power);
-
+            case 1:
+                if (!follower.isBusy()){
+                    scoreMotor.setPower(1.0);
+                }
         }
     }
 

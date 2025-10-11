@@ -28,9 +28,9 @@ public class Constants {
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
 
-    public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
-            .forwardEncoder_HardwareMapName("parallelEncoder")
-            .strafeEncoder_HardwareMapName("perpendicularEncoder");
+//    public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
+//            .forwardEncoder_HardwareMapName("parallelEncoder")
+//            .strafeEncoder_HardwareMapName("perpendicularEncoder");
 
 //            .IMU_HardwareMapName("imu")
 //            .IMU_Orientation(
@@ -42,7 +42,7 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
-                .twoWheelLocalizer(localizerConstants)
+//                .twoWheelLocalizer(localizerConstants)
                 .pathConstraints(pathConstraints)
                 .mecanumDrivetrain(driveConstants)
                 .build();
