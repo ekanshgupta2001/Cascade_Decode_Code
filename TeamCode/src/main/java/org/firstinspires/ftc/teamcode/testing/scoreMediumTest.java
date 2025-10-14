@@ -44,7 +44,6 @@ public class scoreMediumTest extends OpMode {
         scoreMotor = hardwareMap.get(DcMotor.class, "ScoreMotor");
         scoreMotor.setDirection(DcMotor.Direction.FORWARD);
 
-
         adjustHood = hardwareMap.get(Servo.class, "AH");
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
