@@ -24,8 +24,8 @@ public class movementTest extends OpMode {
     private DcMotor rfMotor = null;
     private DcMotor rrMotor = null;
     private TelemetryManager telemetryM;
-//    private DcMotorEx parallelEncoder;
-//    private DcMotorEx perpendicularEncoder;
+    private DcMotorEx parallelEncoder;
+    private DcMotorEx perpendicularEncoder;
     private double adjustSpeed = 0.5;
     private boolean slowModeActive = false;
 
@@ -39,8 +39,8 @@ public class movementTest extends OpMode {
         rrMotor = hardwareMap.dcMotor.get("backRightMotor");
         lrMotor = hardwareMap.dcMotor.get("backLeftMotor");
 
-//        parallelEncoder = hardwareMap.get(DcMotorEx.class, "parallelEncoder");
-//        perpendicularEncoder = hardwareMap.get(DcMotorEx.class, "perpendicularEncoder");
+        parallelEncoder = hardwareMap.get(DcMotorEx.class, "parallelEncoder");
+        perpendicularEncoder = hardwareMap.get(DcMotorEx.class, "perpendicularEncoder");
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
@@ -65,8 +65,8 @@ public class movementTest extends OpMode {
         telemetry.addData("Front Right Power", rfMotor.getPower());
         telemetry.addData("Back Left Power", lrMotor.getPower());
         telemetry.addData("Back Right Power", rrMotor.getPower());
-//        telemetry.addData("Perpendicular Encoders", perpendicularEncoder);
-//        telemetry.addData("Parallel Encoders", parallelEncoder);
+        telemetry.addData("Perpendicular Encoders", perpendicularEncoder);
+        telemetry.addData("Parallel Encoders", parallelEncoder);
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
         telemetry.update();

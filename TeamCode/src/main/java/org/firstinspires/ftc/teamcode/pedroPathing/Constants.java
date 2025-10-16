@@ -28,9 +28,9 @@ public class Constants {
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
 
-//    public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
-//            .forwardEncoder_HardwareMapName("parallelEncoder")
-//            .strafeEncoder_HardwareMapName("perpendicularEncoder");
+    public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
+            .forwardEncoder_HardwareMapName("parallelEncoder")
+            .strafeEncoder_HardwareMapName("perpendicularEncoder");
 
 //            .IMU_HardwareMapName("imu")
 //            .IMU_Orientation(

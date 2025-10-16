@@ -45,6 +45,7 @@ public class observationAuto extends OpMode {
     private DcMotorEx parallelEncoder;
     private DcMotorEx perpendicularEncoder;
     private observationMacro scoreMacro;
+    private boolean isScoreActive = false;
     private int pathState;
 
     private final Pose score1 = new Pose(56, 8, Math.toRadians(110));
@@ -84,10 +85,12 @@ public class observationAuto extends OpMode {
         switch (pathState) {
             case 0:
                 scoreMacro.start();
+                isScoreActive = true;
                 setPathState(1);
                 break;
             case 1:
-                if (!follower.isBusy()){
+                isScoreActive = false;
+                if (!isScoreActive){
                     follower.followPath(move);
                     setPathState(2);
                 }
