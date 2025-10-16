@@ -47,13 +47,14 @@ public class observationAuto extends OpMode {
     private observationMacro scoreMacro;
     private int pathState;
 
-    private final Pose score1 = new Pose(0, 0, Math.toRadians(-15));
-    private final Pose moveToObservation = new Pose(-25, -5, Math.toRadians(0));
-    private final Pose returnToScore = new Pose(0, 0, Math.toRadians(-15));
-    private final Pose movetoObservationTwo = new Pose(-25, 5, Math.toRadians(0));
-    private final Pose returnToScoretwo = new Pose(0, 0, Math.toRadians(-15));
+    private final Pose score1 = new Pose(56, 8, Math.toRadians(110));
+    private final Pose moveToObservation = new Pose(9, 8, Math.toRadians(90));
+    private final Pose parkPose = new Pose(46, 26, Math.toRadians(110));
 
-    private PathChain move, observationPickup, moveAgain, observationPickuptwo;
+    private PathChain move;
+    private PathChain getObservationPickup;
+    private PathChain park;
+
 
     @Override
     public void start() {
@@ -67,20 +68,17 @@ public class observationAuto extends OpMode {
                 .setLinearHeadingInterpolation(score1.getHeading(), moveToObservation.getHeading())
                 .build();
 
-        observationPickup = follower.pathBuilder()
-                .addPath(new BezierLine(moveToObservation, returnToScore))
-                .setLinearHeadingInterpolation(moveToObservation.getHeading(), returnToScore.getHeading())
+        getObservationPickup = follower.pathBuilder()
+                .addPath(new BezierLine(moveToObservation, score1))
+                .setLinearHeadingInterpolation(moveToObservation.getHeading(), score1.getHeading())
                 .build();
 
-        moveAgain = follower.pathBuilder()
-                .addPath(new BezierLine(returnToScore, movetoObservationTwo))
-                .setLinearHeadingInterpolation(returnToScore.getHeading(), movetoObservationTwo.getHeading())
+        park = follower.pathBuilder()
+                .addPath(new BezierLine(score1, parkPose))
+                .setLinearHeadingInterpolation(score1.getHeading(), parkPose.getHeading())
                 .build();
 
-        observationPickuptwo = follower.pathBuilder()
-                .addPath(new BezierLine(movetoObservationTwo, returnToScoretwo))
-                .setLinearHeadingInterpolation(movetoObservationTwo.getHeading(), returnToScoretwo.getHeading())
-                .build();
+
     }
     public void autonomousPathUpdate() {
         switch (pathState) {
@@ -91,31 +89,46 @@ public class observationAuto extends OpMode {
             case 1:
                 if (!follower.isBusy()){
                     follower.followPath(move);
+                    setPathState(2);
                 }
                 break;
 
             case 2:
                 if(!follower.isBusy()){
-                    follower.followPath(observationPickup);
+                    follower.followPath(getObservationPickup);
+                    setPathState(3);
                 }
                 break;
             case 3:
                 if(!follower.isBusy()){
                     scoreMacro.start();
+                    setPathState(4);
                 }
                 break;
             case 4:
                 if (!follower.isBusy()){
-                    follower.followPath(moveAgain);
+                    follower.followPath(move);
+                    setPathState(5);
                 }
                 break;
             case 5:
-                if (follower.isBusy()){
-                    follower.followPath(observationPickuptwo);
+                if (!follower.isBusy()){
+                    follower.followPath(getObservationPickup);
+                    setPathState(6);
                 }
                 break;
             case 6:
-                scoreMacro.start();
+                if (!follower.isBusy()){
+                    scoreMacro.start();
+                    setPathState(7);
+                }
+
+            case 7:
+                if (!follower.isBusy()){
+                    follower.followPath(park);
+                    setPathState(9);
+                }
+
         }
     }
     public void setPathState(int pState) {
