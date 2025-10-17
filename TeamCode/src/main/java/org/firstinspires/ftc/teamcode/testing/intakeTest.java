@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+//import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @TeleOp(name = "intake Test", group = "Robot")
 public class intakeTest extends OpMode {
@@ -26,7 +26,7 @@ public class intakeTest extends OpMode {
     @Override
     public void init() {
 
-        follower = Constants.createFollower(hardwareMap);
+//        follower = Constants.createFollower(hardwareMap);
 
         intakeMotor = hardwareMap.get(DcMotor.class, "IM");
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
