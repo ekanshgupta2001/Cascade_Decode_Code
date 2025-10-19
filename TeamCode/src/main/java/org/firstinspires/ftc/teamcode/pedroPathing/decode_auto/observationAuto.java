@@ -141,6 +141,8 @@ public class observationAuto extends OpMode {
 
     @Override
     public void init() {
+        buildPaths();
+
         follower = Constants.createFollower(hardwareMap);
 
         rfMotor = hardwareMap.dcMotor.get("frontRightMotor");
@@ -175,4 +177,11 @@ public class observationAuto extends OpMode {
         follower.update();
         autonomousPathUpdate();
     }
+
+    @Override
+    public void init_loop() {}
+
+    @Override
+    public void stop() {}
+
 }

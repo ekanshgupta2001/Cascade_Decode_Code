@@ -169,4 +169,10 @@ public class pickUpAuto extends OpMode {
         follower.update();
         autonomousPathUpdate();
     }
+
+    @Override
+    public void init_loop() {}
+
+    @Override
+    public void stop() {}
 }
