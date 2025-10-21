@@ -29,16 +29,16 @@ public class Constants {
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
-            .forwardEncoder_HardwareMapName("parallelEncoder")
-            .strafeEncoder_HardwareMapName("perpendicularEncoder");
+            .forwardEncoder_HardwareMapName("leftFront")
+            .strafeEncoder_HardwareMapName("rightRear")
+            .IMU_HardwareMapName("imu")
+            .IMU_Orientation(
+                    new RevHubOrientationOnRobot(
+                            RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                            RevHubOrientationOnRobot.UsbFacingDirection.LEFT
+                    )
+            );
 
-//            .IMU_HardwareMapName("imu")
-//            .IMU_Orientation(
-//                    new RevHubOrientationOnRobot(
-//                            RevHubOrientationOnRobot.LogoFacingDirection.UP,
-//                            RevHubOrientationOnRobot.UsbFacingDirection.LEFT
-//                    )
-//            );
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
