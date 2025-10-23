@@ -30,6 +30,8 @@ public class cascadeTeleop extends OpMode {
     private TelemetryManager telemetryM;
     private DcMotorEx parallelEncoder;
     private DcMotorEx perpendicularEncoder;
+    private CRServo funnelServoL = null;
+    private CRServo funnelServoR = null;
     private double currentPower = 0;
     private double adjustSpeed = 0.5;
     private double intakeDirection = 0.0;
@@ -49,6 +51,9 @@ public class cascadeTeleop extends OpMode {
 
         intakeMotor = hardwareMap.get(DcMotor.class, "IM");
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        funnelServoL = hardwareMap.get(CRServo.class, "FL");
+        funnelServoR = hardwareMap.get(CRServo.class, "FR");
 
         scoreMotor = hardwareMap.get(DcMotor.class, "ScoreMotor");
         scoreMotor.setDirection(DcMotor.Direction.FORWARD);
@@ -145,14 +150,11 @@ public class cascadeTeleop extends OpMode {
             intakeMotor.setPower(0.0);
         }
     }
-
     public void farTriangle(){
         if (gamepad2.y){
             farScore.start();
         }
-
     }
-
     public void mediumTriangle(){
         if(gamepad2.x){
             scoreMedium.start();

@@ -69,6 +69,7 @@ public class automatedDrive extends OpMode {
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(90), 0.8))
                 .build();
 
+
         telemetry.addLine("Auto complete");
         telemetry.update();
 
@@ -96,6 +97,7 @@ public class automatedDrive extends OpMode {
 
     public void movement(){
 
+        follower.startTeleopDrive();
         follower.update();
         telemetryM.update();
 
