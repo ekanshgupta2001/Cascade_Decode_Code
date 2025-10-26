@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.example;
+package testing.testing.example;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;

@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.nio.file.Path;
 
+@Autonomous
 public class threeArtifactAuto extends OpMode {
 
     private Follower follower;

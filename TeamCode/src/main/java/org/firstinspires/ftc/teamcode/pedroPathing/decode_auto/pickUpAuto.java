@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 
-@Autonomous(name = "Pickup Auto", group = "Pedro")
+@Autonomous
 public class pickUpAuto extends OpMode {
 
     private Follower follower;

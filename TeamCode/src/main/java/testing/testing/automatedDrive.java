@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.testing;
+package testing.testing;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@TeleOp(name = "automation test", group = "Robot")
+@TeleOp
 public class automatedDrive extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;

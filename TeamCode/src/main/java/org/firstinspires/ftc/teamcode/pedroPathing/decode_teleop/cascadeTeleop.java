@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@TeleOp(name = "Cascade Teleop", group = "Robot")
+@TeleOp
 public class cascadeTeleop extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;

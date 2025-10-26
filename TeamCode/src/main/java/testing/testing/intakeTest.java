@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.testing;
+package testing.testing;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 //import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@TeleOp(name = "intake Test", group = "Robot")
+@TeleOp
 public class intakeTest extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;

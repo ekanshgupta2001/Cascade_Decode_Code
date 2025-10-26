@@ -1,23 +1,17 @@
-package org.firstinspires.ftc.teamcode.rundleTeams;
+package testing.testing.rundleTeams;
+
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-public class prototype extends OpMode {
+@TeleOp(name = "Prototype", group = "Robot")
+public class help extends OpMode {
     private DcMotor scoreMotorL = null;
     private DcMotor scoreMotorR = null;
-    private CRServo intakeMotorL = null;
-    private CRServo intakeMotorR = null;
 
     @Override
     public void init() {
-
-        intakeMotorL = hardwareMap.get(CRServo.class, "intakeMotorLeft");
-        intakeMotorR = hardwareMap.get(CRServo.class, "intakeMotorRight");
-        intakeMotorL.setDirection(DcMotor.Direction.FORWARD);
-        intakeMotorR.setDirection(DcMotor.Direction.REVERSE);
-
         scoreMotorL = hardwareMap.get(DcMotor.class, "ScoreMotorLeft");
         scoreMotorL.setDirection(DcMotor.Direction.REVERSE);
         scoreMotorR = hardwareMap.get(DcMotor.class, "ScoreMotorRight");

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.testing;
+package testing.testing;
 
 import static java.lang.Math.tan;
 
@@ -27,7 +27,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@TeleOp(name = "Close Score Test", group = "Robot")
+@TeleOp
 public class scoreCloseTest extends OpMode {
 
     private Follower follower;

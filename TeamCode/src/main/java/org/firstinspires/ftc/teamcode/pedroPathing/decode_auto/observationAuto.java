@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 
-@Autonomous(name = "Observation Zone Auto", group = "Pedro")
+@Autonomous
 public class observationAuto extends OpMode {
 
     private Follower follower;
