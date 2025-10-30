@@ -2,12 +2,15 @@ package testing.testing.vision;
 
 import android.util.Size;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -30,6 +33,10 @@ public class AprilTagWebcam {
                 .setDrawAxes(true) //Draws the Axes
                 .setDrawCubeProjection(true)
                 .setOutputUnits(DistanceUnit.CM, AngleUnit.DEGREES) //Gets the units
+                .setCameraPose(
+                        new Position(DistanceUnit.INCH, 0, 7.5, 2.25, 0),
+                        new YawPitchRollAngles(AngleUnit.DEGREES, 0, 45, 0, 0)
+                )
                 .build();
 
         VisionPortal.Builder builder = new VisionPortal.Builder();
@@ -52,9 +59,9 @@ public class AprilTagWebcam {
         if (detectionID == null){return;}
         if (detectionID.metadata != null) {
             telemetry.addLine(String.format("\n==== (ID %d) %s", detectionID.id, detectionID.metadata.name));
-            telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detectionID.ftcPose.x, detectionID.ftcPose.y, detectionID.ftcPose.z));
+            telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (CM)", detectionID.ftcPose.x, detectionID.ftcPose.y, detectionID.ftcPose.z));
             telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detectionID.ftcPose.pitch, detectionID.ftcPose.roll, detectionID.ftcPose.yaw));
-            telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detectionID.ftcPose.range, detectionID.ftcPose.bearing, detectionID.ftcPose.elevation));
+            telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (CM, deg, deg)", detectionID.ftcPose.range, detectionID.ftcPose.bearing, detectionID.ftcPose.elevation));
         } else {
             telemetry.addLine(String.format("\n==== (ID %d) Unknown", detectionID.id));
             telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detectionID.center.x, detectionID.center.y));
