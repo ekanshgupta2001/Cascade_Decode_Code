@@ -3,23 +3,25 @@ package org.firstinspires.ftc.teamcode.pedroPathing.decode_teleop;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.decode_auto.vision.adjusthood;
+
 
 @TeleOp
 public class cascadeTeleop extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
+    private final ElapsedTime runtime = new ElapsedTime();
     private DcMotor lfMotor = null;
     private DcMotor lrMotor = null;
     private DcMotor rfMotor = null;
@@ -35,19 +37,21 @@ public class cascadeTeleop extends OpMode {
     private double currentPower = 0;
     private double adjustSpeed = 0.5;
     private double intakeDirection = 0.0;
+    private double lastTime;
+    private int lastPosition = 0;
+    private double velocity;
+    private double timeCheck;
     private boolean slowModeActive = false;
-    public scoreFar farScore;
-    public mediumScore scoreMedium;
-    public closeScore scoreClose;
+    public adjusthood hood;
     @Override
     public void init() {
 
         follower = Constants.createFollower(hardwareMap);
 
-        rfMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        lfMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        rrMotor = hardwareMap.dcMotor.get("backRightMotor");
-        lrMotor = hardwareMap.dcMotor.get("backLeftMotor");
+//        rfMotor = hardwareMap.dcMotor.get("frontRightMotor");
+//        lfMotor = hardwareMap.dcMotor.get("frontLeftMotor");
+//        rrMotor = hardwareMap.dcMotor.get("backRightMotor");
+//        lrMotor = hardwareMap.dcMotor.get("backLeftMotor");
 
         intakeMotor = hardwareMap.get(DcMotor.class, "IM");
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -58,8 +62,8 @@ public class cascadeTeleop extends OpMode {
         scoreMotor = hardwareMap.get(DcMotor.class, "ScoreMotor");
         scoreMotor.setDirection(DcMotor.Direction.FORWARD);
 
-        parallelEncoder = hardwareMap.get(DcMotorEx.class, "parallelEncoder");
-        perpendicularEncoder = hardwareMap.get(DcMotorEx.class, "perpendicularEncoder");
+//        parallelEncoder = hardwareMap.get(DcMotorEx.class, "parallelEncoder");
+//        perpendicularEncoder = hardwareMap.get(DcMotorEx.class, "perpendicularEncoder");
 
         adjustHood = hardwareMap.get(Servo.class, "AH");
 
@@ -69,6 +73,11 @@ public class cascadeTeleop extends OpMode {
         actionTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
+
+        lastPosition = scoreMotor.getCurrentPosition();
+        runtime.reset();
+        lastTime = runtime.seconds();
+        timeCheck = runtime.seconds();
 
         telemetry.addLine("Auto complete");
         telemetry.update();
@@ -84,9 +93,20 @@ public class cascadeTeleop extends OpMode {
     public void loop() {
         movement();
         intake();
-        farTriangle();
-        mediumTriangle();
-        closeTriangle();
+        hood.start();
+
+        double currentTime = runtime.seconds();
+        int currentPosition = scoreMotor.getCurrentPosition();
+
+        double deltaTime = currentTime - lastTime;
+        double deltaPosition = currentPosition - lastPosition;
+
+        velocity = deltaPosition / deltaTime;
+
+        lastTime = currentTime;
+        lastPosition = currentPosition;
+
+        telemetry.addData("Motor Velocity", velocity);
 
         telemetry.addData("Front Left Power", lfMotor.getPower());
         telemetry.addData("Front Right Power", rfMotor.getPower());
@@ -133,7 +153,6 @@ public class cascadeTeleop extends OpMode {
             adjustSpeed += 0.2;
         }
 
-        //Optional way to change slow mode strength
         if (gamepad2.dpadLeftWasPressed()) {
             adjustSpeed -= 0.2;
         }
@@ -144,26 +163,16 @@ public class cascadeTeleop extends OpMode {
 
         if (intakeDirection > 0) {
             intakeMotor.setPower(1.0);
+            funnelServoL.setPower(1.0);
+            funnelServoR.setPower(1.0);
         } else if (intakeDirection < 0) {
             intakeMotor.setPower(-1.0);
+            funnelServoL.setPower(-1.0);
+            funnelServoR.setPower(-1.0);
         } else {
             intakeMotor.setPower(0.0);
+            funnelServoL.setPower(0.0);
+            funnelServoR.setPower(0.0);
         }
-    }
-    public void farTriangle(){
-        if (gamepad2.y){
-            farScore.start();
-        }
-    }
-    public void mediumTriangle(){
-        if(gamepad2.x){
-            scoreMedium.start();
-        }
-    }
-    public void closeTriangle(){
-        if (gamepad2.a){
-            scoreClose.start();
-        }
-
     }
 }

@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.List;
 
 @Autonomous
-public class observationAuto extends OpMode {
+public class observationAutoBlue extends OpMode {
 
     private Follower follower;
 

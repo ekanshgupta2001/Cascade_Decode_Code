@@ -5,10 +5,7 @@ import static java.lang.Math.tan;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import com.pedropathing.follower.Follower;
@@ -36,7 +33,6 @@ public class pickUpAuto extends OpMode {
 
     private DcMotor slideMotor;
     private DcMotor armMotor;
-
     private CRServo intakeMotorL;
     private CRServo intakeMotorR;
     private CRServo rotateL;

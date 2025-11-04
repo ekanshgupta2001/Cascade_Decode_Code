@@ -18,6 +18,16 @@ public class AprilTagWebcamExample extends OpMode {
     public void loop() {
         aprilTagWebcam.update();
         AprilTagDetection id20 = aprilTagWebcam.getTagBySpecificID(20);
-        telemetry.addData("id20 String", id20.toString());
+        if (id20 != null) {
+            aprilTagWebcam.displayTelemetry(id20);
+            telemetry.addData("Status", "Tag ID 20 detected and data displayed.");
+        } else {
+            telemetry.addData("Status", "Tag ID 20 not found in current frame.");
+        }
+        telemetry.update();
+    }
+
+    public void stop(){
+        aprilTagWebcam.stop();
     }
 }

@@ -1,8 +1,7 @@
-package testing.testing.vision;
+package org.firstinspires.ftc.teamcode.pedroPathing.decode_auto.vision;
 
 import android.util.Size;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
