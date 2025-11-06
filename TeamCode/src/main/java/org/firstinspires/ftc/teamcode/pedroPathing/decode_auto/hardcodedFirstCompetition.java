@@ -44,6 +44,7 @@ public class hardcodedFirstCompetition extends LinearOpMode {
         telemetry.update();
     }
     public void Auto() {
+
         move(1000, 0.5);
     }
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.decode_auto.vision;
+package org.firstinspires.ftc.teamcode.pedroPathing.vision;
 
 import android.util.Size;
 

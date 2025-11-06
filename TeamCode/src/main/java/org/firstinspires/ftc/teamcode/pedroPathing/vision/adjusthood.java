@@ -1,8 +1,10 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.decode_auto.vision;
+package org.firstinspires.ftc.teamcode.pedroPathing.vision;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -12,9 +14,16 @@ public class adjusthood extends OpMode {
     AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
     private Servo adjustHood = null;
     private DcMotor scoreMotor = null;
+    private final ElapsedTime runtime = new ElapsedTime();
     private double distance = 0;
     private final int RED_SCORE_ZONE_ID = 24;
     private final int BLUE_SCORE_ZONE_ID = 20;
+    private double lastTime;
+    private int lastPosition = 0;
+    private double velocity;
+    private double timeCheck;
+    private CRServo funnelServoL = null;
+    private CRServo funnelServoR = null;
     private AprilTagDetection targetTag = null;
     private int targetId;
 
@@ -25,6 +34,14 @@ public class adjusthood extends OpMode {
         adjustHood = hardwareMap.get(Servo.class, "AH");
         scoreMotor = hardwareMap.get(DcMotor.class, "ScoreMotor");
         scoreMotor.setDirection(DcMotor.Direction.FORWARD);
+
+        funnelServoL = hardwareMap.get(CRServo.class, "FL");
+        funnelServoR = hardwareMap.get(CRServo.class, "FR");
+
+        lastPosition = scoreMotor.getCurrentPosition();
+        runtime.reset();
+        lastTime = runtime.seconds();
+        timeCheck = runtime.seconds();
     }
 
     public void start(){
@@ -59,6 +76,19 @@ public class adjusthood extends OpMode {
         distanceOfAT();
         aprilTagWebcam.displayTelemetry(targetTag);
         Shoot();
+
+        double currentTime = runtime.seconds();
+        int currentPosition = scoreMotor.getCurrentPosition();
+
+        double deltaTime = currentTime - lastTime;
+        double deltaPosition = currentPosition - lastPosition;
+
+        velocity = deltaPosition / deltaTime;
+
+        lastTime = currentTime;
+        lastPosition = currentPosition;
+
+        telemetry.addData("Motor Velocity", velocity);
     }
 
     public void distanceOfAT(){
@@ -91,6 +121,10 @@ public class adjusthood extends OpMode {
     public void Shoot(){
         if (gamepad1.a){
             scoreMotor.setPower(1.0);
+            if (velocity >= 4000){
+                funnelServoL.setPower(1.0);
+                funnelServoR.setPower(1.0);
+            }
         }
     }
 }
