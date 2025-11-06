@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.vision.adjusthood;
+
 
 @Autonomous(name = "Cascade Movement Auto", group = "Autonomous")
 public class hardcodedFirstCompetition extends LinearOpMode {
@@ -17,6 +19,7 @@ public class hardcodedFirstCompetition extends LinearOpMode {
     private DcMotor backLeftMotor = null;
     private DcMotorEx parallelEncoder;
     private DcMotorEx perpendicularEncoder;
+    public adjusthood Hood;
     @Override
     public void runOpMode() {
 
@@ -72,5 +75,8 @@ public class hardcodedFirstCompetition extends LinearOpMode {
         frontRightMotor.setPower(0);
         backRightMotor.setPower(0);
     }
+
+
+
 
 }

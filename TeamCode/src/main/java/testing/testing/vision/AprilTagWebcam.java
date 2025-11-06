@@ -39,6 +39,8 @@ public class AprilTagWebcam {
                 )
                 .build();
 
+        aprilTagProcessor.setDecimation(2);
+
         VisionPortal.Builder builder = new VisionPortal.Builder();
         builder.setCamera(hwMap.get(WebcamName.class, "Webcam 1"));
         builder.setCameraResolution(new Size(640, 480));

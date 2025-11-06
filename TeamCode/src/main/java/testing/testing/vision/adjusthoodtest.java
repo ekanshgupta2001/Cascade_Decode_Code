@@ -7,6 +7,7 @@ import com.pedropathing.ftc.FTCCoordinates;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -24,7 +25,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
-@Autonomous
+@TeleOp
 public class adjusthoodtest extends OpMode {
     AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
     private Servo adjustHood = null;
@@ -76,6 +77,14 @@ public class adjusthoodtest extends OpMode {
         distanceOfAT();
         aprilTagWebcam.displayTelemetry(targetTag);
         Shoot();
+
+        if(targetTag != null){
+            telemetry.addData("Target Found", targetId);
+        }
+        else{
+            telemetry.addData("Tag not found", " :(");
+        }
+        telemetry.update();
     }
 
     public void distanceOfAT(){

@@ -75,6 +75,7 @@ public class adjusthood extends OpMode {
         aprilTagWebcam.update();
         distanceOfAT();
         aprilTagWebcam.displayTelemetry(targetTag);
+
         Shoot();
 
         double currentTime = runtime.seconds();
