@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.decode_auto;
+package org.firstinspires.ftc.teamcode.decode_auto;
 
 import static java.lang.Math.tan;
 

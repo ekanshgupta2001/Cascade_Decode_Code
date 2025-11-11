@@ -1,7 +1,8 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.vision;
+package org.firstinspires.ftc.teamcode.vision;
 
 import android.util.Size;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -33,10 +34,12 @@ public class AprilTagWebcam {
                 .setDrawCubeProjection(true)
                 .setOutputUnits(DistanceUnit.CM, AngleUnit.DEGREES) //Gets the units
                 .setCameraPose(
-                        new Position(DistanceUnit.INCH, 0, 7.5, 2.25, 0),
-                        new YawPitchRollAngles(AngleUnit.DEGREES, 0, 0, 0, 0)
+                        new Position(DistanceUnit.INCH, 0, 13, 8, 0),
+                        new YawPitchRollAngles(AngleUnit.DEGREES, 0, 45, 0, 0)
                 )
                 .build();
+
+        aprilTagProcessor.setDecimation(2);
 
         VisionPortal.Builder builder = new VisionPortal.Builder();
         builder.setCamera(hwMap.get(WebcamName.class, "Webcam 1"));

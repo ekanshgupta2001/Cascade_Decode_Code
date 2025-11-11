@@ -1,12 +1,9 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.decode_auto;
-
-import static java.lang.Math.tan;
+package org.firstinspires.ftc.teamcode.decode_auto;
 
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.util.Timer;
@@ -15,13 +12,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.pedropathing.paths.Path;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-
-import java.util.List;
 
 @Autonomous
 public class observationAutoBlue extends OpMode {

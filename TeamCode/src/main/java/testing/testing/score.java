@@ -13,26 +13,29 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 //import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @TeleOp
-public class intakeTest extends OpMode {
+public class score extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
-    private DcMotor intakeMotor = null;
     private DcMotor scoreMotor = null;
+    private final ElapsedTime runtime = new ElapsedTime();
+    private double lastTime;
+    private int lastPosition = 0;
+    private double velocity;
+    private double timeCheck;
     private TelemetryManager telemetryM;
-    private double intakeDirection = 0.0;
+
     @Override
     public void init() {
 
 //        follower = Constants.createFollower(hardwareMap);
 
-        intakeMotor = hardwareMap.get(DcMotor.class, "IM");
-        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-
         scoreMotor = hardwareMap.get(DcMotor.class, "SM");
+        scoreMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
@@ -48,21 +51,20 @@ public class intakeTest extends OpMode {
 
     @Override
     public void loop() {
-        intake();
+        scoreArt();
     }
 
 
-    public void intake(){
-        intakeDirection = gamepad1.left_trigger - gamepad1.right_trigger;
 
-        if (intakeDirection > 0) {
-            intakeMotor.setPower(1.0);
+    public void scoreArt(){
+        if (gamepad1.a) {
+            scoreMotor.setPower(1.0);
+            telemetry.addData("Score Power", scoreMotor.getPower());
+            telemetry.update();
+
+        } else if (gamepad1.b) {
             scoreMotor.setPower(-0.1);
-        } else if (intakeDirection < 0) {
-            intakeMotor.setPower(-1.0);
-            scoreMotor.setPower(0.1);
         } else {
-            intakeMotor.setPower(0.0);
             scoreMotor.setPower(0.0);
         }
     }

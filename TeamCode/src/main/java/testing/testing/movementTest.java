@@ -4,6 +4,7 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ftc.localization.Encoder;
+import com.pedropathing.geometry.Pose;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,6 +12,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -24,6 +26,7 @@ public class movementTest extends OpMode {
     private DcMotor rfMotor = null;
     private DcMotor rrMotor = null;
     private TelemetryManager telemetryM;
+
     private DcMotorEx parallelEncoder;
     private DcMotorEx perpendicularEncoder;
     private double adjustSpeed = 0.5;
@@ -32,17 +35,13 @@ public class movementTest extends OpMode {
     @Override
     public void init() {
 
-        follower = Constants.createFollower(hardwareMap);
+//        follower = Constants.createFollower(hardwareMap);
 
-        rfMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        lfMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        rrMotor = hardwareMap.dcMotor.get("backRightMotor");
-        lrMotor = hardwareMap.dcMotor.get("backLeftMotor");
+        rrMotor = hardwareMap.get(DcMotor.class, "FL");
 
-        parallelEncoder = hardwareMap.get(DcMotorEx.class, "parallelEncoder");
-        perpendicularEncoder = hardwareMap.get(DcMotorEx.class, "perpendicularEncoder");
+        rrMotor.setDirection(DcMotor.Direction.FORWARD);
 
-        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
+//        follower.setStartingPose(new Pose(0,0,0));
 
         pathTimer = new Timer();
         actionTimer = new Timer();
@@ -52,59 +51,40 @@ public class movementTest extends OpMode {
     }
 
     @Override
-    public void start(){
-        loop();
-        follower.startTeleopDrive();
-    }
-
-    @Override
     public void loop() {
         movement();
 
-        telemetry.addData("Front Left Power", lfMotor.getPower());
-        telemetry.addData("Front Right Power", rfMotor.getPower());
-        telemetry.addData("Back Left Power", lrMotor.getPower());
-        telemetry.addData("Back Right Power", rrMotor.getPower());
-        telemetry.addData("Perpendicular Encoders", perpendicularEncoder);
-        telemetry.addData("Parallel Encoders", parallelEncoder);
-        telemetryM.debug("position", follower.getPose());
-        telemetryM.debug("velocity", follower.getVelocity());
+//        telemetry.addData("Front Left Power", lfMotor.getPower());
+//        telemetry.addData("Front Right Power", rfMotor.getPower());
+//        telemetry.addData("Back Left Power", lrMotor.getPower());
+        telemetry.addData("Back Right Power", lfMotor.getPower());
+//        telemetry.addData("Perpendicular Encoders", perpendicularEncoder);
+//        telemetry.addData("Parallel Encoders", parallelEncoder);
+//        telemetryM.debug("position", follower.getPose());
+//        telemetryM.debug("velocity", follower.getVelocity());
         telemetry.update();
-        telemetryM.update();
+//        telemetryM.update();
     }
 
-    public void movement(){
-        if (gamepad1.dpad_up){
-            slowModeActive = true;
-        }
-        if (gamepad1.dpad_down){
-            slowModeActive = false;
+    public void  movement(){
+        double y = -gamepad1.left_stick_y; // Forward/backward
+        double x = gamepad1.left_stick_x; // Left/right
+        double rotation = gamepad1.right_stick_x; // Rotation
+
+        double frontLeftPower = y + x + rotation;
+        double frontRightPower = y - x - rotation;
+        double backLeftPower = y - x + rotation;
+        double backRightPower = y + x - rotation;
+
+        double maxPower = Math.max(Math.abs(frontLeftPower), Math.max(Math.abs(frontRightPower),
+                Math.max(Math.abs(backLeftPower), Math.abs(backRightPower))));
+        if (maxPower > 1.0) {
+
+            backRightPower /= maxPower;
         }
 
-        if (!slowModeActive) {
-            follower.setTeleOpDrive(
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x,
-                    true
-            );
-        }
-        if (slowModeActive){
-            follower.setTeleOpDrive(
-                    -gamepad1.left_stick_y * adjustSpeed,
-                    -gamepad1.left_stick_x * adjustSpeed,
-                    -gamepad1.right_stick_x * adjustSpeed,
-                    true
-            );
-        }
-        if (gamepad1.dpadRightWasPressed() && adjustSpeed >= 1.0) {
-            adjustSpeed += 0.2;
-        }
+        lfMotor.setPower(backRightPower);
 
-        //Optional way to change slow mode strength
-        if (gamepad2.dpadLeftWasPressed()) {
-            adjustSpeed -= 0.2;
-        }
     }
 
 }

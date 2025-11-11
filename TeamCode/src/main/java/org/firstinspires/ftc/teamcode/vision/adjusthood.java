@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.vision;
+package org.firstinspires.ftc.teamcode.vision;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -14,6 +14,7 @@ public class adjusthood extends OpMode {
     AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
     private Servo adjustHood = null;
     private DcMotor scoreMotor = null;
+    private DcMotor intakeMotor = null;
     private final ElapsedTime runtime = new ElapsedTime();
     private double distance = 0;
     private final int RED_SCORE_ZONE_ID = 24;
@@ -22,8 +23,8 @@ public class adjusthood extends OpMode {
     private int lastPosition = 0;
     private double velocity;
     private double timeCheck;
-    private CRServo funnelServoL = null;
-    private CRServo funnelServoR = null;
+    double ticksPerRev = 0.0;
+    double RPM = 0.0;
     private AprilTagDetection targetTag = null;
     private int targetId;
 
@@ -32,11 +33,11 @@ public class adjusthood extends OpMode {
         aprilTagWebcam.init(hardwareMap, telemetry);
 
         adjustHood = hardwareMap.get(Servo.class, "AH");
-        scoreMotor = hardwareMap.get(DcMotor.class, "ScoreMotor");
+        scoreMotor = hardwareMap.get(DcMotor.class, "SM");
         scoreMotor.setDirection(DcMotor.Direction.FORWARD);
 
-        funnelServoL = hardwareMap.get(CRServo.class, "FL");
-        funnelServoR = hardwareMap.get(CRServo.class, "FR");
+        intakeMotor = hardwareMap.get(DcMotor.class, "IM");
+        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         lastPosition = scoreMotor.getCurrentPosition();
         runtime.reset();
@@ -86,10 +87,13 @@ public class adjusthood extends OpMode {
 
         velocity = deltaPosition / deltaTime;
 
+        ticksPerRev = scoreMotor.getMotorType().getTicksPerRev();
+        RPM = (velocity / ticksPerRev) * 60;
+
         lastTime = currentTime;
         lastPosition = currentPosition;
 
-        telemetry.addData("Motor Velocity", velocity);
+        telemetry.addData("Motor Velocity", RPM);
     }
 
     public void distanceOfAT(){
@@ -112,7 +116,7 @@ public class adjusthood extends OpMode {
             adjustHood.setPosition(0.5);
         }
         else if (distance < 200 && distance > 80) {
-            adjustHood.setPosition(0.3);
+            adjustHood.setPosition(0.1);
         }
         else {
             adjustHood.setPosition(0.0);
@@ -121,10 +125,9 @@ public class adjusthood extends OpMode {
 
     public void Shoot(){
         if (gamepad1.a){
-            scoreMotor.setPower(1.0);
-            if (velocity >= 4000){
-                funnelServoL.setPower(1.0);
-                funnelServoR.setPower(1.0);
+            scoreMotor.setPower(0.8);
+            if (RPM > 4800){
+                intakeMotor.setPower(-1.0);
             }
         }
     }

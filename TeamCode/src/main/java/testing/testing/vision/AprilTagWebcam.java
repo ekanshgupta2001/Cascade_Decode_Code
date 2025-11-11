@@ -34,7 +34,7 @@ public class AprilTagWebcam {
                 .setDrawCubeProjection(true)
                 .setOutputUnits(DistanceUnit.CM, AngleUnit.DEGREES) //Gets the units
                 .setCameraPose(
-                        new Position(DistanceUnit.INCH, 0, 7.5, 2.25, 0),
+                        new Position(DistanceUnit.INCH, 0, 13, 8, 0),
                         new YawPitchRollAngles(AngleUnit.DEGREES, 0, 45, 0, 0)
                 )
                 .build();
