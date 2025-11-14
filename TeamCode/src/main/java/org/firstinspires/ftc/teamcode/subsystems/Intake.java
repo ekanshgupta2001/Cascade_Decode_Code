@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.commands.Command;
@@ -19,6 +20,7 @@ public class Intake {
 
     public Intake(HardwareMap hardwareMap) {
         i = hardwareMap.get(DcMotorEx.class, "IM");
+        i.setDirection(DcMotorSimple.Direction.REVERSE);
         set(0);
     }
 
@@ -43,14 +45,15 @@ public class Intake {
     }
 
     public Command in() {
-        return new InstantCommands(() -> set(in));
+        return new InstantCommands(this::spinIn);
+
     }
 
     public Command out() {
-        return new InstantCommands(() -> set(out));
+        return new InstantCommands(this::spinOut);
     }
 
     public Command stop() {
-        return new InstantCommands(() -> set(0));
+        return new InstantCommands(this::spinIdle);
     }
 }

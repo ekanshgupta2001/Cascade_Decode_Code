@@ -44,24 +44,31 @@ public class tele extends OpMode {
 
     @Override
     public void init_loop(){
-        if (gamepad1.dpad_up){
+        if (gamepad1.dpadUpWasPressed()){
             w.setTargetTagID(BLUE_SCORE_ZONE_ID);
+            telemetry.addLine("Blue Tag Found");
+
         }
-        if (gamepad1.dpad_down){
+        if (gamepad1.dpadDownWasPressed()){
             w.setTargetTagID(RED_SCORE_ZONE_ID);
+            telemetry.addLine("Red Tag Found");
         }
     }
 
     @Override
+    public void start(){
+        follower.startTeleopDrive();
+    }
+
+    @Override
     public void loop() {
+        follower.update();
         hood();
         intake();
         drive();
     }
 
     public void drive(){
-        follower.startTeleopDrive();
-
         if (gamepad1.dpad_up){
             slowModeActive = true;
         }
@@ -90,48 +97,78 @@ public class tele extends OpMode {
             adjustSpeed += 0.2;
         }
 
-        //Optional way to change slow mode strength
         if (gamepad2.dpadLeftWasPressed()) {
             adjustSpeed -= 0.2;
         }
-    }
 
+        telemetry.addLine("Should move");
+    }
+    // Define intake states in your main TeleOp class
+    public enum IntakeState {
+        OFF,
+        INWARD,
+        OUTWARD
+    }
+    private IntakeState currentIntakeState = IntakeState.OFF;
     public void intake(){
-        if (gamepad1.left_bumper){
-            i.in();
-            isIntakeOn = true;
+        if (gamepad1.rightBumperWasPressed() && gamepad1.leftBumperWasPressed()) {
+            currentIntakeState = IntakeState.OFF;
         }
-        if (gamepad1.right_bumper){
-            i.out();
-            isIntakeOn = true;
+        else if (gamepad1.rightBumperWasPressed()) {
+            if (currentIntakeState == IntakeState.INWARD) {
+
+            } else {
+                currentIntakeState = IntakeState.INWARD;
+            }
         }
-        if (gamepad1.right_bumper && gamepad1.left_bumper){
-            isIntakeOn = false;
+        else if (gamepad1.leftBumperWasPressed()) {
+            if (currentIntakeState == IntakeState.OUTWARD) {
+
+            } else {
+                currentIntakeState = IntakeState.OUTWARD;
+            }
         }
-        if (!isIntakeOn){
+
+        if (currentIntakeState == IntakeState.INWARD){
+            i.spinIn();
+        }
+        else if (currentIntakeState == IntakeState.OUTWARD){
+            i.spinOut();
+        }
+        else {
             i.stop();
         }
     }
+
 
     public void hood(){
         w.periodic();
         AprilTagDetection target = w.getTargetTag();
         w.displayTagTelemetry(target);
 
+        distance = -1;
+
         int currentID = w.getTargetTagID();
         if (currentID >= 0){
-            distance = w.getDistancetoTagId(currentID);
+            distance = w.getDistancetoTagId();
         }
+        if (distance > 0) {
+            if (distance >= 200){
+                s.feedUpCommand();
+            }
+            else{
+                s.feedDownCommand();
+            }
 
-        if (distance >= 200){
-            s.feedUpCommand();
-        }
-        else{
+            if (gamepad1.a && distance >= 200){
+                s.scoreFarCommand();
+            }
+            if (gamepad1.a && distance < 200){
+                s.scoreCloseCommand();
+            }
+        } else {
             s.feedDownCommand();
         }
-
-        if (gamepad1.a){
-            s.scoreCommand();
-        }
     }
+
 }

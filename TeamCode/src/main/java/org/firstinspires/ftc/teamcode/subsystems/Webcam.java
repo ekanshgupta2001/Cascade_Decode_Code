@@ -40,7 +40,7 @@ public class Webcam {
                 .setDrawCubeProjection(true)
                 .setOutputUnits(DistanceUnit.CM, AngleUnit.DEGREES) //Gets the units
                 .setCameraPose(
-                        new Position(DistanceUnit.INCH, 0, 13, 8, 0),
+                        new Position(DistanceUnit.INCH, 0, 8, 13, 0),
                         new YawPitchRollAngles(AngleUnit.DEGREES, 0, 15, 0, 0)
                 )
                 .build();
@@ -88,15 +88,18 @@ public class Webcam {
         return getTagBySpecificID(targetTagID);
     }
 
-    public double getDistancetoTagId(int id){
-        AprilTagDetection tag = getTagBySpecificID(id);
-        if (tag == null || tag.ftcPose == null) return -1;
-        return tag.ftcPose.range;
+    public double getDistancetoTagId(){
+        AprilTagDetection tag = getTargetTag();
+        if (tag == null || tag.ftcPose == null){
+            return -1;
+        }
+        return tag.ftcPose.y;
     }
 
     public void displayTagTelemetry(AprilTagDetection detection){
         if (detection == null){
             telemetry.addLine("No Tag found");
+            return;
         }
 
         if (detection.metadata != null){

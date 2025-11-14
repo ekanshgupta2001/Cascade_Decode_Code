@@ -31,6 +31,8 @@ public class Shooter {
         S.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         AH.setPosition(HDown);
+
+        i = new Intake(hardwareMap);
     }
 
     public void setVelocity(double velocity){
@@ -74,13 +76,25 @@ public class Shooter {
         return new InstantCommands(this::feedDown);
     }
 
-    public Command scoreCommand(){
+    public Command scoreFarCommand(){
         return new SequentialCommands(
                 spinFarCommand(),
                 new WaitCommand(6),
                 i.in(),
                 new WaitCommand(4),
-                stopCommand()
+                stopCommand(),
+                i.stop()
+        );
+    }
+
+    public Command scoreCloseCommand(){
+        return new SequentialCommands(
+                spinCloseCommand(),
+                new WaitCommand(4),
+                i.in(),
+                new WaitCommand(4),
+                stopCommand(),
+                i.stop()
         );
     }
 
