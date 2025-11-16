@@ -1,22 +1,20 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+// Import the necessary FTCLib components
+import com.arcrobotics.ftclib.command.Command;
+import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.RunCommand;
 
-import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.commands.Command;
-import org.firstinspires.ftc.teamcode.commands.InstantCommands;
-
-@Configurable
-public class Intake {
+public class Intake extends SubsystemBase {
     private final DcMotorEx i;
     public static double idle = 0;
     public static double in = 1;
     public static double out = -1;
-
 
     public Intake(HardwareMap hardwareMap) {
         i = hardwareMap.get(DcMotorEx.class, "IM");
@@ -40,20 +38,22 @@ public class Intake {
         set(idle);
     }
 
-    public Command idle() {
-        return new InstantCommands(() -> set(idle));
+    public Command idleCommand() {
+        // Use the correct FTCLib class
+        return new InstantCommand(this::spinIdle, this);
     }
 
-    public Command in() {
-        return new InstantCommands(this::spinIn);
-
+    public Command inCommand() {
+        return new RunCommand(this::spinIn, this);
     }
 
-    public Command out() {
-        return new InstantCommands(this::spinOut);
+
+    public Command outCommand() {
+        return new RunCommand(this::spinOut, this);
     }
 
-    public Command stop() {
-        return new InstantCommands(this::spinIdle);
+    public Command stopCommand() {
+        // Use the correct FTCLib class
+        return new InstantCommand(this::spinIdle, this);
     }
 }

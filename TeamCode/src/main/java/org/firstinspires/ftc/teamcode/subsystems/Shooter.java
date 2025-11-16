@@ -1,38 +1,44 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static com.bylazar.panels.Panels.stop;
+// Remove non-standard imports
+// import static com.bylazar.panels.Panels.stop;
+// import org.firstinspires.ftc.teamcode.commands.Command;
+// import org.firstinspires.ftc.teamcode.commands.InstantCommands;
+// import org.firstinspires.ftc.teamcode.commands.SequentialCommands;
+// import org.firstinspires.ftc.teamcode.commands.WaitCommand;
+
+// Import the correct FTCLib command classes
+import com.arcrobotics.ftclib.command.Command;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
+import com.arcrobotics.ftclib.command.SubsystemBase;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.teamcode.commands.Command;
-import org.firstinspires.ftc.teamcode.commands.InstantCommands;
-import org.firstinspires.ftc.teamcode.commands.SequentialCommands;
-import org.firstinspires.ftc.teamcode.commands.WaitCommand;
-
-public class Shooter {
+public class Shooter extends SubsystemBase {
     private Servo AH;
     private DcMotorEx S;
     public static double close = 1250;
     public static double far = 1400;
     public static double HUp = 0.45;
-    public static double HDown = 0.1;
-    Intake i;
+    public static double HDown = 0.25;
+    private final Intake intakeSubsystem;
 
-    public Shooter(HardwareMap hardwareMap) {
+    public Shooter(HardwareMap hardwareMap, Intake intakeSubsystem) {
         S = hardwareMap.get(DcMotorEx.class, "SM");
         AH = hardwareMap.get(Servo.class, "AH");
+        this.intakeSubsystem = intakeSubsystem;
+
 
         S.setDirection(DcMotorSimple.Direction.FORWARD);
         S.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         S.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         AH.setPosition(HDown);
-
-        i = new Intake(hardwareMap);
     }
 
     public void setVelocity(double velocity){
@@ -45,7 +51,7 @@ public class Shooter {
         setVelocity(far);
     }
 
-    public void stop(){
+    public void stopMotor(){
         S.setVelocity(0);
     }
 
@@ -58,44 +64,42 @@ public class Shooter {
     }
 
     public Command spinCloseCommand(){
-        return new InstantCommands(this::spinClose);
+        return new InstantCommand(this::spinClose, this);
     }
     public Command spinFarCommand(){
-        return new InstantCommands(this::spinFar);
+        return new InstantCommand(this::spinFar, this);
     }
 
     public Command stopCommand(){
-        return new InstantCommands(this::stop);
+        return new InstantCommand(this::stopMotor, this);
     }
 
     public Command feedUpCommand(){
-        return new InstantCommands(this::feedUp);
+        return new InstantCommand(this::feedUp);
     }
 
     public Command feedDownCommand(){
-        return new InstantCommands(this::feedDown);
+        return new InstantCommand(this::feedDown);
     }
-
     public Command scoreFarCommand(){
-        return new SequentialCommands(
+        return new SequentialCommandGroup(
                 spinFarCommand(),
-                new WaitCommand(6),
-                i.in(),
-                new WaitCommand(4),
+                new WaitCommand(600),
+                intakeSubsystem.inCommand(),
+                new WaitCommand(400),
                 stopCommand(),
-                i.stop()
+                intakeSubsystem.idleCommand()
         );
     }
 
     public Command scoreCloseCommand(){
-        return new SequentialCommands(
+        return new SequentialCommandGroup(
                 spinCloseCommand(),
-                new WaitCommand(4),
-                i.in(),
-                new WaitCommand(4),
+                new WaitCommand(400),
+                intakeSubsystem.inCommand(),
+                new WaitCommand(400),
                 stopCommand(),
-                i.stop()
+                intakeSubsystem.idleCommand()
         );
     }
-
 }
