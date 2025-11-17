@@ -81,11 +81,14 @@ public class tele extends OpMode {
 
         follower.update();
         hood();
-        intakeManual();
+        intake();
         drive();
 
         lastRightBumperState = driverGamepad.isDown(GamepadKeys.Button.RIGHT_BUMPER);
         lastLeftBumperState = driverGamepad.isDown(GamepadKeys.Button.LEFT_BUMPER);
+
+        s.getTelemetryData(telemetry);
+        i.getTelemetryData(telemetry);
     }
 
     @Override
@@ -117,17 +120,17 @@ public class tele extends OpMode {
                     true
             );
         }
-        if (gamepad1.dpadRightWasPressed() && adjustSpeed >= 1.0) {
+        if (gamepad1.dpadRightWasPressed() && adjustSpeed <= 1.0) {
             adjustSpeed += 0.2;
         }
 
-        if (gamepad2.dpadLeftWasPressed()) {
+        if (gamepad2.dpadLeftWasPressed() && adjustSpeed >= 0.0) {
             adjustSpeed -= 0.2;
         }
 
         telemetry.addLine("Should move");
     }
-    public void intakeManual(){
+    public void intake(){
         boolean currentRightBumper = driverGamepad.isDown(GamepadKeys.Button.RIGHT_BUMPER);
         boolean currentLeftBumper = driverGamepad.isDown(GamepadKeys.Button.LEFT_BUMPER);
 

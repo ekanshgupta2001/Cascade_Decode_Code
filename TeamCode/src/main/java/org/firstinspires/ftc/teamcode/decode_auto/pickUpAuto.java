@@ -37,8 +37,6 @@ public class pickUpAuto extends OpMode {
     private CRServo intakeMotorR;
     private CRServo rotateL;
     private CRServo rotateR;
-
-    private Limelight3A limelight;
     private int pathState;
     private final Pose startPose = new Pose(0, 0, Math.toRadians(0));
     private final Pose moveToBalls = new Pose(25, 111, Math.toRadians(-90));

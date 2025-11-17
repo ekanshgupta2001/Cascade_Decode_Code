@@ -1,24 +1,20 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-// Remove non-standard imports
-// import static com.bylazar.panels.Panels.stop;
-// import org.firstinspires.ftc.teamcode.commands.Command;
-// import org.firstinspires.ftc.teamcode.commands.InstantCommands;
-// import org.firstinspires.ftc.teamcode.commands.SequentialCommands;
-// import org.firstinspires.ftc.teamcode.commands.WaitCommand;
-
-// Import the correct FTCLib command classes
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class Shooter extends SubsystemBase {
     private Servo AH;
     private DcMotorEx S;
@@ -27,6 +23,7 @@ public class Shooter extends SubsystemBase {
     public static double HUp = 0.45;
     public static double HDown = 0.25;
     private final Intake intakeSubsystem;
+    private TelemetryManager telemetryM;
 
     public Shooter(HardwareMap hardwareMap, Intake intakeSubsystem) {
         S = hardwareMap.get(DcMotorEx.class, "SM");
@@ -84,9 +81,9 @@ public class Shooter extends SubsystemBase {
     public Command scoreFarCommand(){
         return new SequentialCommandGroup(
                 spinFarCommand(),
-                new WaitCommand(600),
+                new WaitCommand(5500),
                 intakeSubsystem.inCommand(),
-                new WaitCommand(400),
+                new WaitCommand(4000),
                 stopCommand(),
                 intakeSubsystem.idleCommand()
         );
@@ -95,11 +92,17 @@ public class Shooter extends SubsystemBase {
     public Command scoreCloseCommand(){
         return new SequentialCommandGroup(
                 spinCloseCommand(),
-                new WaitCommand(400),
+                new WaitCommand(4000),
                 intakeSubsystem.inCommand(),
-                new WaitCommand(400),
+                new WaitCommand(4000),
                 stopCommand(),
                 intakeSubsystem.idleCommand()
         );
+    }
+
+    public void getTelemetryData(Telemetry telemetry) {
+        telemetry.addData("Shooter Velocity (actual)", S.getVelocity());
+        telemetry.addData("Target Close Velocity", close);
+        telemetry.addData("Target Far Velocity", far);
     }
 }

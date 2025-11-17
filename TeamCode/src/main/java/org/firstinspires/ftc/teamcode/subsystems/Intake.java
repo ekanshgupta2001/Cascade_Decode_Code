@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 // Import the necessary FTCLib components
+import static org.firstinspires.ftc.teamcode.subsystems.Shooter.close;
+
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -9,6 +11,8 @@ import com.arcrobotics.ftclib.command.RunCommand;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Intake extends SubsystemBase {
     private final DcMotorEx i;
@@ -55,5 +59,9 @@ public class Intake extends SubsystemBase {
     public Command stopCommand() {
         // Use the correct FTCLib class
         return new InstantCommand(this::spinIdle, this);
+    }
+
+    public void getTelemetryData(Telemetry telemetry) {
+        telemetry.addData("Shooter Velocity (actual)", i.getPower());
     }
 }
