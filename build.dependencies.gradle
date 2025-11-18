@@ -26,7 +26,6 @@ dependencies {
     // FTCLib and Pedro Pathing Libraries
     implementation 'com.arcrobotics:ftclib-pathing:2.3.0'
 
-    // Dashboard and other specific libraries (ensure these versions are correct for your setup)
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
     implementation 'com.acmerobotics.slothboard:dashboard:0.2.4+0.4.17'
     implementation 'com.bylazar:fullpanels:1.0.6'

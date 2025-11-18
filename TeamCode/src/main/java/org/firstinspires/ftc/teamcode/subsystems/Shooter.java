@@ -105,4 +105,19 @@ public class Shooter extends SubsystemBase {
         telemetry.addData("Target Close Velocity", close);
         telemetry.addData("Target Far Velocity", far);
     }
+
+    public Command CloseAuto(){
+        return new SequentialCommandGroup(
+               spinCloseCommand(),
+               new WaitCommand(3500),
+               intakeSubsystem.inCommand(),
+               new WaitCommand(1250),
+               intakeSubsystem.stopCommand(),
+               spinCloseCommand(),
+               intakeSubsystem.inCommand(),
+               new WaitCommand(1250),
+               intakeSubsystem.stopCommand(),
+               stopCommand()
+        );
+    }
 }

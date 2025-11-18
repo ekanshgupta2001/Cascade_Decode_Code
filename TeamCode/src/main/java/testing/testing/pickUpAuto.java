@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.decode_auto;
-
-import static java.lang.Math.tan;
+package testing.testing;
 
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -11,14 +9,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.util.Timer;
 
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-
-import java.util.List;
 
 @Autonomous
 public class pickUpAuto extends OpMode {
