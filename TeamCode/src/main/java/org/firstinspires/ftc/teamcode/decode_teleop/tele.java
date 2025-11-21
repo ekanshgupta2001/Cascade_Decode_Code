@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Webcam;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 @TeleOp
 public class tele extends OpMode {
@@ -26,19 +27,19 @@ public class tele extends OpMode {
     Shooter s;
     Webcam w;
     private GamepadEx driverGamepad;
-
     private final int RED_SCORE_ZONE_ID = 24;
     private final int BLUE_SCORE_ZONE_ID = 20;
     public static Pose startingPose;
-    double distance = 0;
+    double distance = -1;
     private TelemetryManager telemetryM;
     private boolean slowModeActive = false;
-    private double adjustSpeed = 0.5;
+    private double adjustSpeed = 0.25;
 
     private boolean lastRightBumperState = false;
     private boolean lastLeftBumperState = false;
     private boolean isIntakeInward = false;
     private boolean isIntakeOutward = false;
+    private boolean isShooterActive = false;
 
 
     @Override
@@ -80,6 +81,7 @@ public class tele extends OpMode {
         driverGamepad.readButtons();
 
         follower.update();
+        telemetryM.update();
         hood();
         intake();
         drive();
@@ -87,8 +89,18 @@ public class tele extends OpMode {
         lastRightBumperState = driverGamepad.isDown(GamepadKeys.Button.RIGHT_BUMPER);
         lastLeftBumperState = driverGamepad.isDown(GamepadKeys.Button.LEFT_BUMPER);
 
+        if (gamepad1.aWasPressed()) {
+            isShooterActive = true;
+        }
+        if (gamepad1.xWasPressed()){
+            isShooterActive = false;
+        }
+
+        w.displayTagTelemetry(w.getTargetTag());
         s.getTelemetryData(telemetry);
         i.getTelemetryData(telemetry);
+        telemetry.addData("Distance to April Tag", distance);
+        telemetry.update();
     }
 
     @Override
@@ -97,29 +109,31 @@ public class tele extends OpMode {
     }
 
     public void drive(){
-        if (gamepad1.dpad_up){
+        if (gamepad1.dpadUpWasPressed()){
             slowModeActive = true;
+            telemetry.addLine("Slow Mode On");
         }
-        if (gamepad1.dpad_down){
+        if (gamepad1.dpadDownWasPressed()){
             slowModeActive = false;
+            telemetry.addLine("Slow Mode off");
         }
 
-        if (!slowModeActive) {
+        if (!slowModeActive)
             follower.setTeleOpDrive(
                     -gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
                     -gamepad1.right_stick_x,
                     true
             );
-        }
-        if (slowModeActive){
+
+        if (slowModeActive)
             follower.setTeleOpDrive(
                     -gamepad1.left_stick_y * adjustSpeed,
                     -gamepad1.left_stick_x * adjustSpeed,
                     -gamepad1.right_stick_x * adjustSpeed,
                     true
             );
-        }
+
         if (gamepad1.dpadRightWasPressed() && adjustSpeed <= 1.0) {
             adjustSpeed += 0.2;
         }
@@ -151,6 +165,7 @@ public class tele extends OpMode {
 
         if (isIntakeInward) {
             CommandScheduler.getInstance().schedule(i.inCommand());
+            CommandScheduler.getInstance().schedule(s.intakein());
         } else if (isIntakeOutward) {
             CommandScheduler.getInstance().schedule(i.outCommand());
         } else {
@@ -160,37 +175,32 @@ public class tele extends OpMode {
         }
     }
 
-
     public void hood(){
         w.periodic();
-        AprilTagDetection target = w.getTargetTag();
-        w.displayTagTelemetry(target);
 
-        distance = -1;
 
         int currentID = w.getTargetTagID();
         if (currentID >= 0){
             distance = w.getDistancetoTagId();
         }
         if (distance > 0) {
-            if (distance >= 200){
-                s.feedUp();
-            }
-            else{
-                s.feedDown();
+            if (isShooterActive && distance >= 200) {
+                CommandScheduler.getInstance().schedule(s.feedUpCommand());
+                CommandScheduler.getInstance().schedule(s.scoreFarCommand());
+            } else if (isShooterActive && distance < 200) {
+                CommandScheduler.getInstance().schedule(s.feedUpCommand());
+                CommandScheduler.getInstance().schedule(s.scoreCloseCommand());
+            } else {
+                s.setDefaultCommand(s.stopCommand());
             }
 
-            if (gamepad1.a && !driverGamepad.isDown(GamepadKeys.Button.A) && distance >= 200){
-                CommandScheduler.getInstance().schedule(s.scoreFarCommand());
-            }
-            if (gamepad1.a && !driverGamepad.isDown(GamepadKeys.Button.A) && distance < 200){
-                CommandScheduler.getInstance().schedule(s.scoreCloseCommand());
-            }
         } else {
-            s.feedDown();
+            if(s.getDefaultCommand() == null || gamepad1.xWasPressed()){
+                s.setDefaultCommand(s.stopCommand());
+            }
         }
 
-        telemetry.addData("Distance to April Tag", distance);
-        telemetry.update();
+//        telemetry.addData("Distance to April Tag", distance);
+//        telemetry.update();
     }
 }

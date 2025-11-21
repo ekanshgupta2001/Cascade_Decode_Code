@@ -2,11 +2,14 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 
 import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,10 +23,13 @@ public class Shooter extends SubsystemBase {
     private DcMotorEx S;
     public static double close = 1250;
     public static double far = 1400;
-    public static double HUp = 0.45;
-    public static double HDown = 0.25;
+    public static double HUp = 0.5;
+    public static double HDown = 0.1;
+    public static double intakePower = -150;
     private final Intake intakeSubsystem;
     private TelemetryManager telemetryM;
+    private Timer actionTimer;
+    private boolean actionIsRunning = false;
 
     public Shooter(HardwareMap hardwareMap, Intake intakeSubsystem) {
         S = hardwareMap.get(DcMotorEx.class, "SM");
@@ -32,7 +38,7 @@ public class Shooter extends SubsystemBase {
 
 
         S.setDirection(DcMotorSimple.Direction.FORWARD);
-        S.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        S.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         S.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         AH.setPosition(HDown);
@@ -46,6 +52,9 @@ public class Shooter extends SubsystemBase {
     }
     public void spinFar(){
         setVelocity(far);
+    }
+    public void intake(){
+        setVelocity(intakePower);
     }
 
     public void stopMotor(){
@@ -61,27 +70,34 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command spinCloseCommand(){
-        return new InstantCommand(this::spinClose, this);
+        return new RunCommand(this::spinClose, this);
+    }
+    public Command intakein(){
+        return new RunCommand(this::intake, this);
     }
     public Command spinFarCommand(){
-        return new InstantCommand(this::spinFar, this);
+        return new RunCommand(this::spinFar, this);
     }
 
     public Command stopCommand(){
-        return new InstantCommand(this::stopMotor, this);
+        return new RunCommand(this::stopMotor, this);
     }
 
     public Command feedUpCommand(){
-        return new InstantCommand(this::feedUp);
+        return new RunCommand(this::feedUp);
     }
 
     public Command feedDownCommand(){
-        return new InstantCommand(this::feedDown);
+        return new RunCommand(this::feedDown);
+    }
+    public boolean isAtVelocity(double targetVelocity) {
+        double tolerance = 0.05 * Math.abs(targetVelocity);
+        return Math.abs(S.getVelocity() - targetVelocity) < tolerance;
     }
     public Command scoreFarCommand(){
         return new SequentialCommandGroup(
                 spinFarCommand(),
-                new WaitCommand(5500),
+                new WaitUntilCommand(() -> isAtVelocity(far)),
                 intakeSubsystem.inCommand(),
                 new WaitCommand(4000),
                 stopCommand(),
@@ -92,7 +108,7 @@ public class Shooter extends SubsystemBase {
     public Command scoreCloseCommand(){
         return new SequentialCommandGroup(
                 spinCloseCommand(),
-                new WaitCommand(4000),
+                new WaitUntilCommand(() -> isAtVelocity(close)),
                 intakeSubsystem.inCommand(),
                 new WaitCommand(4000),
                 stopCommand(),
@@ -106,10 +122,11 @@ public class Shooter extends SubsystemBase {
         telemetry.addData("Target Far Velocity", far);
     }
 
+
     public Command CloseAuto(){
         return new SequentialCommandGroup(
                spinCloseCommand(),
-               new WaitCommand(3500),
+                new WaitUntilCommand(() -> isAtVelocity(close)),
                intakeSubsystem.inCommand(),
                new WaitCommand(1250),
                intakeSubsystem.stopCommand(),
@@ -117,7 +134,33 @@ public class Shooter extends SubsystemBase {
                intakeSubsystem.inCommand(),
                new WaitCommand(1250),
                intakeSubsystem.stopCommand(),
-               stopCommand()
+               stopCommand(),
+               new InstantCommand(() -> {
+                   actionIsRunning = false;
+               })
         );
+    }
+
+    public Command FarAuto(){
+        return new SequentialCommandGroup(
+                spinFarCommand(),
+                new WaitUntilCommand(() -> isAtVelocity(far)),
+                intakeSubsystem.inCommand(),
+                new WaitCommand(1250),
+                intakeSubsystem.stopCommand(),
+                spinFarCommand(),
+                intakeSubsystem.inCommand(),
+                new WaitCommand(1250),
+                intakeSubsystem.stopCommand(),
+                stopCommand(),
+                new InstantCommand(() -> {
+
+                    actionIsRunning = false;
+                })
+        );
+    }
+
+    public boolean isAutoActionRunning() {
+        return actionIsRunning;
     }
 }

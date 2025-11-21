@@ -65,25 +65,24 @@ public class red extends LinearOpMode {
     }
 
     public void auto(){
-        if (target.ftcPose.y < 150 || target == null){
-            movement(-0.5, 1300);
-            sleep(1500);
-            s.CloseAuto();
-            moveSideways(-0.5, 500);
-            sleep(3000);
-            rotate(400, -0.5);
-            i.inCommand();
-            sleep(1000);
-            movement(0.7, 1000);
-            sleep(1000);
-            movement(-0.7, 1000);
-            i.stopCommand();
-            sleep(1000);
-            rotate(400, 0.5);
-            s.CloseAuto();
-            sleep(5000);
-            moveSideways(-0.5, 1000);
-        }
+        movement(-0.5, 1300);
+        sleep(1500);
+        s.CloseAuto();
+        moveSideways(-0.5, 500);
+        sleep(3000);
+        rotate(400, -0.5);
+        i.inCommand();
+        sleep(1000);
+        movement(0.7, 1000);
+        sleep(1000);
+        movement(-0.7, 1000);
+        i.stopCommand();
+        sleep(1000);
+        rotate(400, 0.5);
+        s.CloseAuto();
+        sleep(5000);
+        moveSideways(-0.5, 1000);
+
     }
 
     public void movement(double speed, long movement){

@@ -17,12 +17,12 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Intake extends SubsystemBase {
     private final DcMotorEx i;
     public static double idle = 0;
-    public static double in = 1;
-    public static double out = -1;
+    public static double in = -1;
+    public static double out = 1;
 
     public Intake(HardwareMap hardwareMap) {
         i = hardwareMap.get(DcMotorEx.class, "IM");
-        i.setDirection(DcMotorSimple.Direction.REVERSE);
+        i.setDirection(DcMotorSimple.Direction.FORWARD);
         set(0);
     }
 
@@ -44,7 +44,7 @@ public class Intake extends SubsystemBase {
 
     public Command idleCommand() {
         // Use the correct FTCLib class
-        return new InstantCommand(this::spinIdle, this);
+        return new RunCommand(this::spinIdle, this);
     }
 
     public Command inCommand() {
@@ -58,7 +58,7 @@ public class Intake extends SubsystemBase {
 
     public Command stopCommand() {
         // Use the correct FTCLib class
-        return new InstantCommand(this::spinIdle, this);
+        return new RunCommand(this::spinIdle, this);
     }
 
     public void getTelemetryData(Telemetry telemetry) {
