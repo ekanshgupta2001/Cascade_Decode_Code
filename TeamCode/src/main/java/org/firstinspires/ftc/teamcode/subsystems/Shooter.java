@@ -21,9 +21,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Shooter extends SubsystemBase {
     private Servo AH;
     private DcMotorEx S;
-    public static double close = 1250;
-    public static double far = 1400;
-    public static double HUp = 0.5;
+    public static double close = 1100;
+    public static double far = 1375;
+    public static double HUp = 0.3;
     public static double HDown = 0.1;
     public static double intakePower = -150;
     private final Intake intakeSubsystem;
@@ -70,15 +70,14 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command spinCloseCommand(){
-        return new RunCommand(this::spinClose, this);
+        return new InstantCommand(this::spinClose, this);
     }
     public Command intakein(){
         return new RunCommand(this::intake, this);
     }
     public Command spinFarCommand(){
-        return new RunCommand(this::spinFar, this);
+        return new InstantCommand(this::spinFar, this);
     }
-
     public Command stopCommand(){
         return new RunCommand(this::stopMotor, this);
     }
@@ -99,7 +98,7 @@ public class Shooter extends SubsystemBase {
                 spinFarCommand(),
                 new WaitUntilCommand(() -> isAtVelocity(far)),
                 intakeSubsystem.inCommand(),
-                new WaitCommand(4000),
+                new WaitCommand(1000),
                 stopCommand(),
                 intakeSubsystem.idleCommand()
         );
@@ -110,7 +109,7 @@ public class Shooter extends SubsystemBase {
                 spinCloseCommand(),
                 new WaitUntilCommand(() -> isAtVelocity(close)),
                 intakeSubsystem.inCommand(),
-                new WaitCommand(4000),
+                new WaitCommand(1000),
                 stopCommand(),
                 intakeSubsystem.idleCommand()
         );
@@ -123,14 +122,16 @@ public class Shooter extends SubsystemBase {
     }
 
 
-    public Command CloseAuto(){
+    public Command closeAuto(){
         return new SequentialCommandGroup(
+               feedUpCommand(),
                spinCloseCommand(),
                 new WaitUntilCommand(() -> isAtVelocity(close)),
                intakeSubsystem.inCommand(),
-               new WaitCommand(1250),
+               new WaitCommand(300),
                intakeSubsystem.stopCommand(),
                spinCloseCommand(),
+                new WaitUntilCommand(() -> isAtVelocity(close)),
                intakeSubsystem.inCommand(),
                new WaitCommand(1250),
                intakeSubsystem.stopCommand(),
@@ -141,14 +142,24 @@ public class Shooter extends SubsystemBase {
         );
     }
 
+    public Command stop(){
+        return new SequentialCommandGroup(
+                intakein(),
+                new WaitCommand(500),
+                stopCommand()
+        );
+    }
+
     public Command FarAuto(){
         return new SequentialCommandGroup(
+                feedUpCommand(),
                 spinFarCommand(),
                 new WaitUntilCommand(() -> isAtVelocity(far)),
                 intakeSubsystem.inCommand(),
-                new WaitCommand(1250),
+                new WaitCommand(300),
                 intakeSubsystem.stopCommand(),
                 spinFarCommand(),
+                new WaitUntilCommand(() -> isAtVelocity(far)),
                 intakeSubsystem.inCommand(),
                 new WaitCommand(1250),
                 intakeSubsystem.stopCommand(),

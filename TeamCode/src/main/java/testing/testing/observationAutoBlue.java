@@ -16,7 +16,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous
 public class observationAutoBlue extends OpMode {
 
     private Follower follower;

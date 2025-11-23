@@ -18,7 +18,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous
 public class threeArtifactAuto extends OpMode {
 
     private Follower follower;

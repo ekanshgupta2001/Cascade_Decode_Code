@@ -16,7 +16,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 //import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@TeleOp
 public class intakeTest extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;

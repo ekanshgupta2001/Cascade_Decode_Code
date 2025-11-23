@@ -27,7 +27,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@TeleOp
 public class farScoreTest extends OpMode {
 
     private Follower follower;

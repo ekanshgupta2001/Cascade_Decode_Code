@@ -17,7 +17,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 //import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@TeleOp
 public class servoTest extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;

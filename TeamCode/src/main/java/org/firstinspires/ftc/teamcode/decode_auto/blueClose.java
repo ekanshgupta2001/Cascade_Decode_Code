@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.decode_auto;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.Pose;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -61,7 +60,7 @@ public class blueClose extends OpMode {
         switch (pathState){
             case 0:
                 follower.followPath(p.scoreP());
-                s.CloseAuto();
+                s.closeAuto();
                 setPathState(1);
                 break;
             case 1:
@@ -80,7 +79,7 @@ public class blueClose extends OpMode {
             case 3:
                 if (!follower.isBusy() && actionTimer.getElapsedTime() > 1){
                     i.stopCommand();
-                    s.CloseAuto();
+                    s.closeAuto();
                     follower.followPath(p.scoreTwo());
                     setPathState(4);
                 }
@@ -101,7 +100,7 @@ public class blueClose extends OpMode {
             case 6:
                 if (!follower.isBusy() && actionTimer.getElapsedTime() > 1){
                     i.stopCommand();
-                    s.CloseAuto();
+                    s.closeAuto();
                     follower.followPath(p.scoreThird());
                     setPathState(7);
                 }
@@ -122,7 +121,7 @@ public class blueClose extends OpMode {
             case 9:
                 if (!follower.isBusy() && actionTimer.getElapsedTime() > 1){
                     i.stopCommand();
-                    s.CloseAuto();
+                    s.closeAuto();
                     follower.followPath(p.scoreFourth());
                     setPathState(10);
                 }

@@ -5,7 +5,6 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -68,7 +67,7 @@ public class blue extends LinearOpMode {
        if (target.ftcPose.y < 150 || target == null){
            movement(-0.5, 1300);
            sleep(1500);
-           s.CloseAuto();
+           s.closeAuto();
            moveSideways(0.5, 500);
            sleep(3000);
            rotate(400, 0.5);
@@ -80,7 +79,7 @@ public class blue extends LinearOpMode {
            i.stopCommand();
            sleep(1000);
            rotate(400, -0.5);
-           s.CloseAuto();
+           s.closeAuto();
            sleep(5000);
            moveSideways(0.5, 1000);
        }

@@ -93,6 +93,13 @@ public class tele extends OpMode {
             isShooterActive = true;
         }
         if (gamepad1.xWasPressed()){
+            CommandScheduler.getInstance().schedule(s.stop());
+            isShooterActive = false;
+        }
+
+        if (gamepad1.xWasPressed()){
+            CommandScheduler.getInstance().schedule(s.stopCommand());
+            CommandScheduler.getInstance().schedule(s.stopCommand());
             isShooterActive = false;
         }
 
@@ -178,25 +185,17 @@ public class tele extends OpMode {
     public void hood(){
         w.periodic();
 
-
         int currentID = w.getTargetTagID();
         if (currentID >= 0){
             distance = w.getDistancetoTagId();
         }
-        if (distance > 0) {
-            if (isShooterActive && distance >= 200) {
+        if (isShooterActive && distance > 0) {
+            if (distance >= 200) {
                 CommandScheduler.getInstance().schedule(s.feedUpCommand());
                 CommandScheduler.getInstance().schedule(s.scoreFarCommand());
-            } else if (isShooterActive && distance < 200) {
+            } else if (distance < 200) {
                 CommandScheduler.getInstance().schedule(s.feedUpCommand());
                 CommandScheduler.getInstance().schedule(s.scoreCloseCommand());
-            } else {
-                s.setDefaultCommand(s.stopCommand());
-            }
-
-        } else {
-            if(s.getDefaultCommand() == null || gamepad1.xWasPressed()){
-                s.setDefaultCommand(s.stopCommand());
             }
         }
 

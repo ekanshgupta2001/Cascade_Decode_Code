@@ -22,7 +22,6 @@ import java.util.function.Supplier;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@TeleOp
 public class automatedDrive extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
