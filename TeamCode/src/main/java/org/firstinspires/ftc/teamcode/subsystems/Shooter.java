@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,6 +21,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+@Configurable
 public class Shooter extends SubsystemBase {
     private Servo AH;
     private DcMotorEx S;
@@ -192,7 +194,7 @@ public class Shooter extends SubsystemBase {
         );
     }
 
-    public Command FarAuto(){
+    public Command farAuto(){
         return new SequentialCommandGroup(
                 feedUpCommand(),
                 spinFarCommand(),

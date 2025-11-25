@@ -112,7 +112,7 @@ public class farPaths {
                 .setLinearHeadingInterpolation(secondPick.getHeading(), thirdScore.getHeading())
                 .build();
     }
-    public PathChain park() {
+    public PathChain parkPath() {
         return follower.pathBuilder()
                 .addPath(
                         new BezierLine(
