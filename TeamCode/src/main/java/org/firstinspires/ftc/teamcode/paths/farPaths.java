@@ -1,61 +1,60 @@
 package org.firstinspires.ftc.teamcode.paths;
-import com.pedropathing.geometry.BezierCurve;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.paths.PathChain;
+
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 
 import org.firstinspires.ftc.teamcode.Alliance;
 
-public class closePath {
+public class farPaths {
     public Follower follower;
-    public Pose start = new Pose(21.913, 123, Math.toRadians(136));
-    public Pose scorefirst = new Pose(60, 84, Math.toRadians(136));
-    public Pose setFirstPick = new Pose(60, 84, Math.toRadians(180));
-    public Pose firstPick = new Pose(16.5, 84, Math.toRadians(180));
-    public Pose scoreSecond = new Pose(60, 84, Math.toRadians(136));
-    public Pose setSecondPick = new Pose(45, 60, Math.toRadians(180));
-    public Pose secondPick = new Pose(10, 60, Math.toRadians(180));
-    public Pose thirdScore = new Pose(45, 60, Math.toRadians(145));
-    public Pose setThirdPick = new Pose(60, 84, Math.toRadians(136));
-    public Pose thirdPick = new Pose(10, 36, Math.toRadians(180));
-    public Pose fourthScore = new Pose(60, 84, Math.toRadians(136));
-    public closePath(Follower follower, Alliance alliance) {
+    public Pose start = new Pose(52, 8, Math.toRadians(90));
+    public Pose scoreFirst = new Pose(52, 15, Math.toRadians(103));
+    public Pose setFirstPick = new Pose(52, 15, Math.toRadians(180));
+    public Pose firstPick = new Pose(10, 15, Math.toRadians(180));
+    public Pose scoreSecond = new Pose(52, 15, Math.toRadians(103));
+    public Pose setSecondPick = new Pose(52, 15, Math.toRadians(180));
+    public Pose secondPick = new Pose(10, 15, Math.toRadians(180));
+    public Pose thirdScore = new Pose(52, 15, Math.toRadians(103));
+    public Pose park = new Pose(52, 33, Math.toRadians(90));
+
+    public farPaths(Follower follower, Alliance alliance) {
         this.follower = follower;
         if (alliance == Alliance.RED){
             start = start.mirror();
-            scorefirst = scorefirst.mirror();
+            scoreFirst = scoreFirst.mirror();
             setFirstPick = setFirstPick.mirror();
             firstPick = firstPick.mirror();
             scoreSecond = scoreSecond.mirror();
             setSecondPick = setSecondPick.mirror();
             secondPick = secondPick.mirror();
             thirdScore = thirdScore.mirror();
-            setThirdPick = setThirdPick.mirror();
-            thirdPick = thirdPick.mirror();
-            fourthScore = fourthScore.mirror();
+            park = park.mirror();
+
         }
     }
+
     public PathChain scoreP() {
         return follower.pathBuilder()
                 .addPath(
                         new BezierLine(
                                 start,
-                                scorefirst
+                                scoreFirst
                         )
                 )
-                .setLinearHeadingInterpolation(start.getHeading(), scorefirst.getHeading())
+                .setLinearHeadingInterpolation(start.getHeading(), scoreFirst.getHeading())
                 .build();
     }
     public PathChain setOne() {
         return follower.pathBuilder()
                 .addPath(
                         new BezierLine(
-                                scorefirst,
+                                scoreFirst,
                                 setFirstPick
                         )
                 )
-                .setLinearHeadingInterpolation(scorefirst.getHeading(), setFirstPick.getHeading())
+                .setLinearHeadingInterpolation(scoreFirst.getHeading(), setFirstPick.getHeading())
                 .build();
     }
     public PathChain pickOne() {
@@ -113,61 +112,17 @@ public class closePath {
                 .setLinearHeadingInterpolation(secondPick.getHeading(), thirdScore.getHeading())
                 .build();
     }
-    public PathChain setThird() {
+    public PathChain park() {
         return follower.pathBuilder()
                 .addPath(
                         new BezierLine(
                                 thirdScore,
-                                setThirdPick
+                                park
                         )
                 )
-                .setLinearHeadingInterpolation(thirdScore.getHeading(), setThirdPick.getHeading())
-                .build();
-    }
-    public PathChain pickThree() {
-        return follower.pathBuilder()
-                .addPath(
-                        new BezierLine(
-                                setThirdPick,
-                                thirdPick
-                        )
-                )
-                .setLinearHeadingInterpolation(setThirdPick.getHeading(), thirdPick.getHeading())
-                .build();
-    }
-    public PathChain scoreFourth() {
-        return follower.pathBuilder()
-                .addPath(
-                        new BezierLine(
-                                thirdPick,
-                                fourthScore
-                        )
-                )
-                .setLinearHeadingInterpolation(thirdPick.getHeading(), fourthScore.getHeading())
+                .setLinearHeadingInterpolation(thirdScore.getHeading(), park.getHeading())
                 .build();
     }
 
-//    public PathChain next() {
-//        switch (index++) {
-//            case 0: return scoreP();
-//            case 1: return setOne();
-//            case 2: return pickOne();
-//            case 3: return scoreTwo();
-//            case 4: return setTwo();
-//            case 5: return pickTwo();
-//            case 6: return scoreThird();
-//            case 7: return setThird();
-//            case 8: return pickThree();
-//            case 9: return scoreFourth();
-//            default: return null;
-//        }
-//    }
-//    public boolean hasNext() {
-//        int PATH_COUNT = 9;
-//        return index < PATH_COUNT;
-//    }
-//    public void reset() {
-//        index = 0;
-//    }
 
 }

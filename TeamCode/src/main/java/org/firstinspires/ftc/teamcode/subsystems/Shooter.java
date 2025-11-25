@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.pedropathing.control.PIDFCoefficients;
+import com.pedropathing.control.PIDFController;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -21,10 +23,20 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Shooter extends SubsystemBase {
     private Servo AH;
     private DcMotorEx S;
+    private double targetVelocity = 0;
+    private PIDFController b, s;
+    public static double bp = 0.0;
+    public static double bd = 0.0;
+    public static double bf = 0.000357;
+    public static double sp = 0.0;
+    public static double sd = 0.0;
+    public static double sf = 0.000357;
+    public static double pSwitch = 50;
+    public static double targetVelocityTuning = 1400;
     public static double close = 1100;
     public static double far = 1375;
-    public static double HUp = 0.3;
-    public static double HDown = 0.1;
+    public static double HUp = 0.35;
+    public static double HDown = 0.15;
     public static double intakePower = -150;
     private final Intake intakeSubsystem;
     private TelemetryManager telemetryM;
@@ -36,6 +48,8 @@ public class Shooter extends SubsystemBase {
         AH = hardwareMap.get(Servo.class, "AH");
         this.intakeSubsystem = intakeSubsystem;
 
+        b = new PIDFController(new PIDFCoefficients(bp, 0, bd, bf));
+        s = new PIDFController(new PIDFCoefficients(sp, 0, sd, sf));
 
         S.setDirection(DcMotorSimple.Direction.FORWARD);
         S.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -44,8 +58,36 @@ public class Shooter extends SubsystemBase {
         AH.setPosition(HDown);
     }
 
+    @Override
+    public void periodic() {
+        b.setCoefficients(new PIDFCoefficients(bp, 0, bd, bf));
+        s.setCoefficients(new PIDFCoefficients(sp, 0, sd, sf));
+
+        double currentVelocity = S.getVelocity();
+        double error = targetVelocity - currentVelocity;
+        double motorPower;
+
+        if (Math.abs(error) < pSwitch) {
+            s.updateError(error);
+            motorPower = s.run();
+        } else {
+            b.updateError(error);
+            motorPower = b.run();
+        }
+
+        S.setPower(motorPower);
+    }
+
     public void setVelocity(double velocity){
         S.setVelocity(velocity);
+        this.targetVelocity = velocity;
+    }
+    public double getVelocity() {
+        return S.getVelocity();
+    }
+
+    public double getMotorPower() {
+        return S.getPower();
     }
     public void spinClose(){
         setVelocity(close);
@@ -90,7 +132,7 @@ public class Shooter extends SubsystemBase {
         return new RunCommand(this::feedDown);
     }
     public boolean isAtVelocity(double targetVelocity) {
-        double tolerance = 0.05 * Math.abs(targetVelocity);
+        double tolerance = 0.03 * Math.abs(targetVelocity);
         return Math.abs(S.getVelocity() - targetVelocity) < tolerance;
     }
     public Command scoreFarCommand(){
@@ -133,7 +175,7 @@ public class Shooter extends SubsystemBase {
                spinCloseCommand(),
                 new WaitUntilCommand(() -> isAtVelocity(close)),
                intakeSubsystem.inCommand(),
-               new WaitCommand(1250),
+               new WaitCommand(750),
                intakeSubsystem.stopCommand(),
                stopCommand(),
                new InstantCommand(() -> {

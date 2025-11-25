@@ -21,12 +21,13 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 @TeleOp
-public class tele extends OpMode {
+public class tele2Drive extends OpMode {
     private Follower follower;
     Intake i;
     Shooter s;
     Webcam w;
-    private GamepadEx driverGamepad;
+    private GamepadEx driverGamepad1;
+    private GamepadEx driverGamepad2;
     private final int RED_SCORE_ZONE_ID = 24;
     private final int BLUE_SCORE_ZONE_ID = 20;
     public static Pose startingPose;
@@ -53,12 +54,14 @@ public class tele extends OpMode {
         i = new Intake(hardwareMap);
         s = new Shooter(hardwareMap, i);
 
-        driverGamepad = new GamepadEx(gamepad1);
+        driverGamepad1 = new GamepadEx(gamepad1);
+        driverGamepad2 = new GamepadEx(gamepad2);
     }
 
     @Override
     public void init_loop(){
-        driverGamepad.readButtons();
+        driverGamepad1.readButtons();
+        driverGamepad2.readButtons();
 
         if (gamepad1.dpadUpWasPressed()){
             w.setTargetTagID(BLUE_SCORE_ZONE_ID);
@@ -78,7 +81,8 @@ public class tele extends OpMode {
     @Override
     public void loop() {
         CommandScheduler.getInstance().run();
-        driverGamepad.readButtons();
+        driverGamepad1.readButtons();
+        driverGamepad2.readButtons();
 
         follower.update();
         telemetryM.update();
@@ -86,18 +90,18 @@ public class tele extends OpMode {
         intake();
         drive();
 
-        lastRightBumperState = driverGamepad.isDown(GamepadKeys.Button.RIGHT_BUMPER);
-        lastLeftBumperState = driverGamepad.isDown(GamepadKeys.Button.LEFT_BUMPER);
+        lastRightBumperState = driverGamepad2.isDown(GamepadKeys.Button.RIGHT_BUMPER);
+        lastLeftBumperState = driverGamepad2.isDown(GamepadKeys.Button.LEFT_BUMPER);
 
-        if (gamepad1.aWasPressed()) {
+        if (gamepad2.aWasPressed()) {
             isShooterActive = true;
         }
-        if (gamepad1.xWasPressed()){
+        if (gamepad2.xWasPressed()){
             CommandScheduler.getInstance().schedule(s.stop());
             isShooterActive = false;
         }
 
-        if (gamepad1.xWasPressed()){
+        if (gamepad2.xWasPressed()){
             CommandScheduler.getInstance().schedule(s.stopCommand());
             CommandScheduler.getInstance().schedule(s.stopCommand());
             isShooterActive = false;
@@ -155,8 +159,8 @@ public class tele extends OpMode {
         telemetry.addLine("Should move");
     }
     public void intake(){
-        boolean currentRightBumper = driverGamepad.isDown(GamepadKeys.Button.RIGHT_BUMPER);
-        boolean currentLeftBumper = driverGamepad.isDown(GamepadKeys.Button.LEFT_BUMPER);
+        boolean currentRightBumper = driverGamepad2.isDown(GamepadKeys.Button.RIGHT_BUMPER);
+        boolean currentLeftBumper = driverGamepad2.isDown(GamepadKeys.Button.LEFT_BUMPER);
 
         if (currentRightBumper && currentLeftBumper) {
             CommandScheduler.getInstance().schedule(i.stopCommand());

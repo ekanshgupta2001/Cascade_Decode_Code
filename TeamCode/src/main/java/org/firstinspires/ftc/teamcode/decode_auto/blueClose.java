@@ -59,6 +59,7 @@ public class blueClose extends OpMode {
     public void autonomousPathUpdate(){
         switch (pathState){
             case 0:
+
                 follower.followPath(p.scoreP());
                 s.closeAuto();
                 setPathState(1);
