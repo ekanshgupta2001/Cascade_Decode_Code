@@ -39,6 +39,7 @@ public class redFarAuto extends LinearOpMode {
         waitForStart();
 
         driveTrain.drive(0.4, 0, 0);
+        CommandScheduler.getInstance().schedule(shooter.feedUpCommand());
         sleep(500);
         driveTrain.stop();
 

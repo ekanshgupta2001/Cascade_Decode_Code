@@ -42,6 +42,7 @@ public class redCloseAuto extends LinearOpMode {
         driveToTag(DESIRED_DISTANCE_CM);
 
         CommandScheduler.getInstance().schedule(shooter.scoreCloseCommand());
+        CommandScheduler.getInstance().schedule(shooter.feedUpCommand());
         sleep(2000);
         CommandScheduler.getInstance().run();
 
