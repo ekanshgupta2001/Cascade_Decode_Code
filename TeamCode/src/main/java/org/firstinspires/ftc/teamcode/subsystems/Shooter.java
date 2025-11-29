@@ -21,9 +21,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Shooter extends SubsystemBase {
     private Servo AH;
     private DcMotorEx S;
-    public static double close = 1100;
+    public static double close = 1000;
     public static double far = 1375;
-    public static double HUp = 0.8;
+    public static double HUp = 0.55;
     public static double HDown = 0.15;
     public static double HZero = 0.0;
     public static double intakePower = -150;
@@ -104,8 +104,9 @@ public class Shooter extends SubsystemBase {
         return new SequentialCommandGroup(
                 spinFarCommand(),
                 new WaitUntilCommand(() -> isAtVelocity(far)),
+                spinFarCommand(),
                 intakeSubsystem.inCommand(),
-                new WaitCommand(1000),
+                new WaitCommand(3000),
                 stopCommand(),
                 intakeSubsystem.idleCommand()
         );
@@ -115,8 +116,9 @@ public class Shooter extends SubsystemBase {
         return new SequentialCommandGroup(
                 spinCloseCommand(),
                 new WaitUntilCommand(() -> isAtVelocity(close)),
+                spinFarCommand(),
                 intakeSubsystem.inCommand(),
-                new WaitCommand(1000),
+                new WaitCommand(3000),
                 stopCommand(),
                 intakeSubsystem.idleCommand()
         );

@@ -1,108 +1,137 @@
 package org.firstinspires.ftc.teamcode.decode_auto;
 
-import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.subsystems.Webcam;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
+//import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
 public class redCloseAuto extends LinearOpMode {
-    private Webcam webcam;
-    private DriveTrain driveTrain;
-    private Intake intake;
-    private Shooter shooter;
-
-    private final int RED_SCORE_ZONE_ID = 24;
-    private static final double DESIRED_DISTANCE_CM = 100.0;
-    private static final double ALIGNMENT_THRESHOLD_DEG = 2.0;
-    private static final double DISTANCE_THRESHOLD_CM = 5.0;
-
-    private static final double TURN_GAIN = 0.02;
-    private static final double FORWARD_GAIN = 0.03;
-    private static final double MAX_AUTO_SPEED = 0.5;
-
+    private Follower follower;
+    private Timer pathTimer, actionTimer, opmodeTimer;
+    private final ElapsedTime runtime = new ElapsedTime();
+    private DcMotor lfMotor = null;
+    private DcMotor lrMotor = null;
+    private DcMotor rfMotor = null;
+    private DcMotor rrMotor = null;
+    private DcMotor scoreMotor = null;
+    private DcMotor intakeMotor = null;
+    private Servo adjustHood = null;
+    private TelemetryManager telemetryM;
+    private DcMotorEx parallelEncoder;
+    private DcMotorEx perpendicularEncoder;
+    private double currentPower = 0;
+    private double adjustSpeed = 0.5;
+    private double intakeDirection = 0.0;
+    private double lastTime;
+    private int lastPosition = 0;
+    private double velocity;
+    private double timeCheck;
+    private boolean slowModeActive = false;
     @Override
     public void runOpMode() {
-        webcam = new Webcam(hardwareMap, telemetry, "Webcam 1");
-        driveTrain = new DriveTrain(hardwareMap);
-        intake = new Intake(hardwareMap);
-        shooter = new Shooter(hardwareMap, intake);
 
-        webcam.setTargetTagID(RED_SCORE_ZONE_ID);
+        intakeMotor = hardwareMap.get(DcMotor.class, "IM");
+        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        telemetry.addData("Status", "Ready. Waiting for Start.");
+        scoreMotor = hardwareMap.get(DcMotor.class, "SM");
+        scoreMotor.setDirection(DcMotor.Direction.FORWARD);
+
+        adjustHood = hardwareMap.get(Servo.class, "AH");
+        adjustHood.setDirection(Servo.Direction.FORWARD);
+
+        lfMotor = hardwareMap.get(DcMotor.class, "FL");
+        lrMotor = hardwareMap.get(DcMotor.class, "BL");
+        rfMotor = hardwareMap.get(DcMotor.class, "FR");
+        rrMotor = hardwareMap.get(DcMotor.class, "BR");
+
+        lfMotor.setDirection(DcMotor.Direction.FORWARD);
+        lrMotor.setDirection(DcMotor.Direction.FORWARD);
+        rfMotor.setDirection(DcMotor.Direction.REVERSE);
+        rrMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        telemetry.addData("Status", "Ready");
         telemetry.update();
 
         waitForStart();
 
-        driveToTag(DESIRED_DISTANCE_CM);
-
-        CommandScheduler.getInstance().schedule(shooter.scoreCloseCommand());
-        CommandScheduler.getInstance().schedule(shooter.feedUpCommand());
-        sleep(2000);
-        CommandScheduler.getInstance().run();
-
-        turnDegrees(900);
-        driveTrain.drive(0.5, 0, 0);
-        CommandScheduler.getInstance().schedule(intake.inCommand());
-        sleep(2000);
-        driveTrain.stop();
-        CommandScheduler.getInstance().run();
-
-        driveTrain.drive(-0.5, 0, 0);
-        sleep(2000);
-
-        turnDegrees(-900);
-        driveToTag(DESIRED_DISTANCE_CM);
-
-        CommandScheduler.getInstance().schedule(shooter.scoreCloseCommand());
-        sleep(2000);
-        CommandScheduler.getInstance().run();
-
+        Auto();
+        sleep(100000);
         telemetry.addData("Auto phase", "Done");
         telemetry.update();
-        webcam.stop();
+    }
+    public void Auto() {
+        move(1300, -0.5);
+        sleep(1000);
+        moveSideways(-0.5, 500);
+        sleep(1000);
+        shoot(0.45, 0.7, 2000);
+        sleep(5000);
+        moveSideways(0.5, 750);
+        shoot(0.0, 0.0, 2000);
     }
 
-    public void driveToTag(double desiredDistanceCM) {
-        while (opModeIsActive()) {
-            webcam.periodic();
-            AprilTagDetection targetTag = webcam.getTargetTag();
+    public void move(long movement, double speed) {
+        telemetry.addData("Current Status", "Moving");
+        telemetry.update();
+        double frontLeftPower;
+        double backLeftPower;
+        double frontRightPower;
+        double backRightPower;
 
-            if (targetTag != null) {
-                double distanceError = targetTag.ftcPose.range - desiredDistanceCM;
-                double headingError = targetTag.ftcPose.bearing;
+        frontLeftPower = speed;
+        backLeftPower = speed;
+        frontRightPower = speed;
+        backRightPower = speed;
 
-                if (Math.abs(distanceError) < DISTANCE_THRESHOLD_CM && Math.abs(headingError) < ALIGNMENT_THRESHOLD_DEG) {
-                    driveTrain.stop();
-                    return;
-                }
+        lfMotor.setPower(frontLeftPower);
+        lrMotor.setPower(backLeftPower);
+        rfMotor.setPower(frontRightPower);
+        rrMotor.setPower(backRightPower);
 
-                double forwardPower = distanceError * FORWARD_GAIN;
-                double turnPower = headingError * TURN_GAIN;
-                double strafePower = 0.0;
-
-                forwardPower = Math.copySign(Math.min(Math.abs(forwardPower), MAX_AUTO_SPEED), forwardPower);
-                turnPower = Math.copySign(Math.min(Math.abs(turnPower), MAX_AUTO_SPEED), turnPower);
-
-                driveTrain.drive(forwardPower, strafePower, turnPower);
-                webcam.displayTagTelemetry(targetTag);
-
-            } else {
-                driveTrain.stop();
-                telemetry.addLine("Tag lost. Stopping movement.");
-            }
-            telemetry.update();
-        }
+        sleep(movement);
+        lfMotor.setPower(0);
+        lrMotor.setPower(0);
+        rfMotor.setPower(0);
+        rrMotor.setPower(0);
     }
 
-    public void turnDegrees(int milliseconds) {
-        driveTrain.drive(0, 0, Math.copySign(0.4, milliseconds));
-        sleep(Math.abs(milliseconds));
-        driveTrain.stop();
+    public void shoot(double angle, double speed, long time){
+        scoreMotor.setPower(speed);
+        adjustHood.setPosition(angle);
+        sleep(5000);
+        intakeMotor.setPower(-1.0);
+        scoreMotor.setPower(speed);
+        sleep(time);
+
+        intakeMotor.setPower(0.0);
+        adjustHood.setPosition(0.0);
+        scoreMotor.setPower(0.0);
     }
+
+    public void moveSideways(double speed, long time){
+        lfMotor.setPower(-speed);
+        rfMotor.setPower(speed);
+        lrMotor.setPower(speed);
+        rrMotor.setPower(-speed);
+
+        sleep(time);
+
+        lfMotor.setPower(0.0);
+        rfMotor.setPower(0.0);
+        lrMotor.setPower(0.0);
+        rrMotor.setPower(0.0);
+
+    }
+
+
+
+
 }

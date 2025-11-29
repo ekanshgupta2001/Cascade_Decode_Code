@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.decode_teleop;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -71,6 +72,7 @@ public class tele2Drive extends OpMode {
     @Override
     public void start(){
         follower.startTeleopDrive();
+        CommandScheduler.getInstance().schedule(s.feedZeroCommand());
 
         CommandScheduler.getInstance().schedule(s.feedUpCommand());
     }
@@ -96,9 +98,9 @@ public class tele2Drive extends OpMode {
         }
 
         if (gamepad2.xWasPressed()){
+            CommandScheduler.getInstance().schedule(s.feedUpCommand());
             CommandScheduler.getInstance().schedule(s.stop());
             CommandScheduler.getInstance().schedule(s.stopCommand());
-//            CommandScheduler.getInstance().schedule(s.feedDownCommand());
             isShooterActive = false;
         }
 
@@ -189,7 +191,9 @@ public class tele2Drive extends OpMode {
             if (distance >= 200) {
 //                CommandScheduler.getInstance().schedule(s.feedUpCommand());
                 CommandScheduler.getInstance().schedule(s.scoreFarCommand());
+
             } else if (distance < 200) {
+//                CommandScheduler.getInstance().schedule(s.feedDownCommand());
 //                CommandScheduler.getInstance().schedule(s.feedDownCommand());
                 CommandScheduler.getInstance().schedule(s.scoreCloseCommand());
             }
