@@ -151,7 +151,7 @@ public class cascadeTeleop extends OpMode {
     }
 
     public void intake() {
-        intakeDirection = gamepad1.left_trigger - gamepad1.right_trigger;
+        intakeDirection = gamepad2.left_trigger - gamepad2.right_trigger;
 
         if (intakeDirection > 0.0){
             intakeMotor.setPower(-1.0);
@@ -168,7 +168,7 @@ public class cascadeTeleop extends OpMode {
     }
 
     public void scoreArt(){
-        if (gamepad1.a) {
+        if (gamepad2.a) {
             if (currentHoodPosition > 0.2){
                 scoreMotor.setPower(0.8);
             }
@@ -179,7 +179,7 @@ public class cascadeTeleop extends OpMode {
             telemetry.addData("Score Power", scoreMotor.getPower());
             telemetry.update();
 
-        } else if (gamepad1.x) {
+        } else if (gamepad2.x) {
             scoreMotor.setPower(-0.3);
             intakeMotor.setPower(-1.0);
             telemetry.addData("Score Power", scoreMotor.getPower());
@@ -191,10 +191,10 @@ public class cascadeTeleop extends OpMode {
         currentHoodPosition = Math.min(currentHoodPosition, 0.5);
         currentHoodPosition = Math.max(0.0, currentHoodPosition);
         adjustHood.setPosition(currentHoodPosition);
-        if (gamepad1.dpad_down){
+        if (gamepad2.dpad_down){
             currentHoodPosition += 0.1;
         }
-        else if(gamepad1.dpad_up){
+        else if(gamepad2.dpad_up){
             currentHoodPosition -= 0.1;
         }
     }

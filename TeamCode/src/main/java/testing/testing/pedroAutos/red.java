@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.decode_auto;
+package testing.testing.pedroAutos;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Webcam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-@Autonomous
+//@Autonomous
 public class red extends LinearOpMode {
     private Follower follower;
     Intake i;
@@ -66,7 +66,7 @@ public class red extends LinearOpMode {
     public void auto(){
         movement(-0.5, 1300);
         sleep(1500);
-        s.closeAuto();
+        s.scoreCloseCommand();
         moveSideways(-0.5, 500);
         sleep(3000);
         rotate(400, -0.5);
@@ -78,7 +78,7 @@ public class red extends LinearOpMode {
         i.stopCommand();
         sleep(1000);
         rotate(400, 0.5);
-        s.closeAuto();
+        s.scoreCloseCommand();
         sleep(5000);
         moveSideways(-0.5, 1000);
 

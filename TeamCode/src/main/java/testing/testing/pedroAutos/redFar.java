@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.decode_auto;
+package testing.testing.pedroAutos;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -8,14 +8,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Alliance;
-import org.firstinspires.ftc.teamcode.paths.closePath;
 import org.firstinspires.ftc.teamcode.paths.farPaths;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Webcam;
-@Autonomous
-public class blueFar extends OpMode {
+//@Autonomous
+public class redFar extends OpMode {
     private Follower follower;
     Alliance alliance;
     Intake i;
@@ -33,7 +32,7 @@ public class blueFar extends OpMode {
         w = new Webcam(hardwareMap, telemetry, "Webcam 1");
         i = new Intake(hardwareMap);
         s = new Shooter(hardwareMap, i);
-        p = new farPaths(follower, Alliance.BLUE);
+        p = new farPaths(follower, Alliance.RED);
 
         pathTimer = new Timer();
         actionTimer = new Timer();
@@ -61,13 +60,14 @@ public class blueFar extends OpMode {
         switch (pathState){
             case 0:
                 follower.followPath(p.scoreP());
-                s.farAuto();
+                s.scoreFarCommand();
                 setPathState(1);
                 break;
             case 1:
                 if (!follower.isBusy() && !s.isAutoActionRunning()){
                     follower.followPath(p.setOne());
                     i.inCommand();
+                    s.intakein();
                     setPathState(2);
                 }
                 break;
@@ -80,7 +80,7 @@ public class blueFar extends OpMode {
             case 3:
                 if (!follower.isBusy() && actionTimer.getElapsedTime() > 1){
                     i.stopCommand();
-                    s.farAuto();
+                    s.scoreFarCommand();
                     follower.followPath(p.scoreTwo());
                     setPathState(4);
                 }
@@ -89,6 +89,7 @@ public class blueFar extends OpMode {
                 if (!follower.isBusy() && !s.isAutoActionRunning()){
                     follower.followPath(p.setTwo());
                     i.inCommand();
+                    s.intakein();
                     setPathState(5);
                 }
                 break;
@@ -101,7 +102,7 @@ public class blueFar extends OpMode {
             case 6:
                 if (!follower.isBusy() && actionTimer.getElapsedTime() > 1){
                     i.stopCommand();
-                    s.closeAuto();
+                    s.scoreFarCommand();
                     follower.followPath(p.scoreThird());
                     setPathState(7);
                 }

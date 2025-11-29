@@ -7,53 +7,64 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
-
+import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class Shooter extends SubsystemBase {
+@Configurable
+public class ShooterWait extends SubsystemBase {
     private Servo AH;
     private DcMotorEx S;
+    private double targetVelocity = 0;
     public static double close = 1100;
     public static double far = 1375;
-    public static double HUp = 0.8;
-    public static double HDown = 0.15;
+    public static double HUp = 0.40;
+    public static double HDown = 0.20;
     public static double HZero = 0.0;
-    public static double intakePower = -150;
+    public static double intakePower = -150;;
     private final Intake intakeSubsystem;
+    private double currentHoodPosition = 0.0;
     private TelemetryManager telemetryM;
-    private Timer actionTimer;
+    private final double VELOCITY_TOLERANCE_MAGNITUDE = 0.05;
     private boolean actionIsRunning = false;
 
-    public Shooter(HardwareMap hardwareMap, Intake intakeSubsystem) {
+    public ShooterWait(HardwareMap hardwareMap, Intake intakeSubsystem) {
         S = hardwareMap.get(DcMotorEx.class, "SM");
         AH = hardwareMap.get(Servo.class, "AH");
-        AH.setDirection(Servo.Direction.FORWARD);
+        AH.setDirection(Servo.Direction.REVERSE);
         this.intakeSubsystem = intakeSubsystem;
-
         S.setDirection(DcMotorSimple.Direction.FORWARD);
         S.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         S.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-//        AH.setPosition(HDown);
+        AH.setPosition(HDown);
     }
 
     public void setVelocity(double velocity){
         S.setVelocity(velocity);
+        this.targetVelocity = velocity;
     }
+
+    public double getVelocity() {
+        return S.getVelocity();
+    }
+
+    public double getMotorPower() {
+        return S.getPower();
+    }
+
     public void spinClose(){
         setVelocity(close);
     }
+
     public void spinFar(){
         setVelocity(far);
     }
+
     public void intake(){
         setVelocity(intakePower);
     }
@@ -69,6 +80,7 @@ public class Shooter extends SubsystemBase {
     public void feedDown(){
         AH.setPosition(HDown);
     }
+
     public void feedZero(){
         AH.setPosition(HZero);
     }
@@ -76,34 +88,40 @@ public class Shooter extends SubsystemBase {
     public Command spinCloseCommand(){
         return new InstantCommand(this::spinClose, this);
     }
+
     public Command intakein(){
         return new RunCommand(this::intake, this);
     }
+
     public Command spinFarCommand(){
         return new InstantCommand(this::spinFar, this);
     }
+
     public Command stopCommand(){
         return new RunCommand(this::stopMotor, this);
     }
 
     public Command feedUpCommand(){
-        return new RunCommand(this::feedUp);
+        return new InstantCommand(this::feedUp);
     }
 
     public Command feedDownCommand(){
-        return new RunCommand(this::feedDown);
+        return new InstantCommand(this::feedDown);
     }
+
     public Command feedZeroCommand(){
-        return new RunCommand(this::feedZero);
+        return new InstantCommand(this::feedZero);
     }
+
     public boolean isAtVelocity(double targetVelocity) {
-        double tolerance = 0.05 * Math.abs(targetVelocity);
-        return Math.abs(S.getVelocity() - targetVelocity) < tolerance;
+        return Math.abs(S.getVelocity() - targetVelocity) < VELOCITY_TOLERANCE_MAGNITUDE;
     }
+
     public Command scoreFarCommand(){
         return new SequentialCommandGroup(
                 spinFarCommand(),
                 new WaitUntilCommand(() -> isAtVelocity(far)),
+                new WaitCommand(300),
                 intakeSubsystem.inCommand(),
                 new WaitCommand(1000),
                 stopCommand(),
@@ -115,6 +133,7 @@ public class Shooter extends SubsystemBase {
         return new SequentialCommandGroup(
                 spinCloseCommand(),
                 new WaitUntilCommand(() -> isAtVelocity(close)),
+                new WaitCommand(300),
                 intakeSubsystem.inCommand(),
                 new WaitCommand(1000),
                 stopCommand(),
@@ -128,7 +147,6 @@ public class Shooter extends SubsystemBase {
         telemetry.addData("Target Far Velocity", far);
     }
 
-
     public Command closeAuto(){
         return new SequentialCommandGroup(
                 feedUpCommand(),
@@ -140,7 +158,7 @@ public class Shooter extends SubsystemBase {
                 spinCloseCommand(),
                 new WaitUntilCommand(() -> isAtVelocity(close)),
                 intakeSubsystem.inCommand(),
-                new WaitCommand(1250),
+                new WaitCommand(750),
                 intakeSubsystem.stopCommand(),
                 stopCommand(),
                 new InstantCommand(() -> {
@@ -157,7 +175,7 @@ public class Shooter extends SubsystemBase {
         );
     }
 
-    public Command FarAuto(){
+    public Command farAuto(){
         return new SequentialCommandGroup(
                 feedUpCommand(),
                 spinFarCommand(),
@@ -172,7 +190,6 @@ public class Shooter extends SubsystemBase {
                 intakeSubsystem.stopCommand(),
                 stopCommand(),
                 new InstantCommand(() -> {
-
                     actionIsRunning = false;
                 })
         );

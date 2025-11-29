@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.decode_auto;
+package testing.testing.pedroAutos;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -8,19 +8,19 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Alliance;
-import org.firstinspires.ftc.teamcode.paths.closePath;
+import org.firstinspires.ftc.teamcode.paths.farPaths;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Webcam;
-@Autonomous
-public class redClose extends OpMode {
+//@Autonomous
+public class blueFar extends OpMode {
     private Follower follower;
     Alliance alliance;
     Intake i;
     Shooter s;
     Webcam w;
-    closePath p;
+    farPaths p;
     private TelemetryManager telemetryM;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
@@ -32,9 +32,10 @@ public class redClose extends OpMode {
         w = new Webcam(hardwareMap, telemetry, "Webcam 1");
         i = new Intake(hardwareMap);
         s = new Shooter(hardwareMap, i);
-        p = new closePath(follower, Alliance.RED);
+        p = new farPaths(follower, Alliance.BLUE);
 
         pathTimer = new Timer();
+        actionTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
@@ -59,13 +60,14 @@ public class redClose extends OpMode {
         switch (pathState){
             case 0:
                 follower.followPath(p.scoreP());
-                s.closeAuto();
+                s.scoreFarCommand();
                 setPathState(1);
                 break;
             case 1:
                 if (!follower.isBusy() && !s.isAutoActionRunning()){
                     follower.followPath(p.setOne());
                     i.inCommand();
+                    s.intakein();
                     setPathState(2);
                 }
                 break;
@@ -78,7 +80,7 @@ public class redClose extends OpMode {
             case 3:
                 if (!follower.isBusy() && actionTimer.getElapsedTime() > 1){
                     i.stopCommand();
-                    s.closeAuto();
+                    s.scoreFarCommand();
                     follower.followPath(p.scoreTwo());
                     setPathState(4);
                 }
@@ -87,6 +89,7 @@ public class redClose extends OpMode {
                 if (!follower.isBusy() && !s.isAutoActionRunning()){
                     follower.followPath(p.setTwo());
                     i.inCommand();
+                    s.intakein();
                     setPathState(5);
                 }
                 break;
@@ -99,34 +102,19 @@ public class redClose extends OpMode {
             case 6:
                 if (!follower.isBusy() && actionTimer.getElapsedTime() > 1){
                     i.stopCommand();
-                    s.closeAuto();
+                    s.scoreFarCommand();
                     follower.followPath(p.scoreThird());
                     setPathState(7);
                 }
                 break;
             case 7:
                 if (!follower.isBusy() && !s.isAutoActionRunning()){
-                    follower.followPath(p.setThird());
-                    i.inCommand();
+                    follower.followPath(p.parkPath());
+
                     setPathState(8);
                 }
                 break;
             case 8:
-                if (!follower.isBusy()){
-                    follower.followPath(p.pickThree());
-                    setPathState(9);
-                }
-                break;
-            case 9:
-                if (!follower.isBusy() && actionTimer.getElapsedTime() > 1){
-                    i.stopCommand();
-                    s.closeAuto();
-                    follower.followPath(p.scoreFourth());
-                    setPathState(10);
-                }
-                break;
-
-            case 10:
                 if(!follower.isBusy()) {
                     setPathState(-1);
                 }

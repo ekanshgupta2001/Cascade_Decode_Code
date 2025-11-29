@@ -21,7 +21,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 @TeleOp
-public class tele extends OpMode {
+public class tele extends OpMode{
     private Follower follower;
     Intake i;
     Shooter s;
@@ -100,6 +100,7 @@ public class tele extends OpMode {
         if (gamepad1.xWasPressed()){
             CommandScheduler.getInstance().schedule(s.stopCommand());
             CommandScheduler.getInstance().schedule(s.stopCommand());
+            CommandScheduler.getInstance().schedule(s.feedDownCommand());
             isShooterActive = false;
         }
 

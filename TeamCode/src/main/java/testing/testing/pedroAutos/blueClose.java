@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.decode_auto;
+package testing.testing.pedroAutos;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Webcam;
-@Autonomous
+//@Autonomous
 public class blueClose extends OpMode {
     private Follower follower;
     Alliance alliance;
@@ -32,7 +32,7 @@ public class blueClose extends OpMode {
         w = new Webcam(hardwareMap, telemetry, "Webcam 1");
         i = new Intake(hardwareMap);
         s = new Shooter(hardwareMap, i);
-        p = new closePath(follower, Alliance.BLUE);
+        p = new closePath(follower, Alliance.RED);
 
         pathTimer = new Timer();
         actionTimer = new Timer();
@@ -61,13 +61,14 @@ public class blueClose extends OpMode {
             case 0:
 
                 follower.followPath(p.scoreP());
-                s.closeAuto();
+                s.spinCloseCommand();
                 setPathState(1);
                 break;
             case 1:
                 if (!follower.isBusy() && !s.isAutoActionRunning()){
                     follower.followPath(p.setOne());
                     i.inCommand();
+                    s.intakein();
                     setPathState(2);
                 }
                 break;
@@ -80,7 +81,7 @@ public class blueClose extends OpMode {
             case 3:
                 if (!follower.isBusy() && actionTimer.getElapsedTime() > 1){
                     i.stopCommand();
-                    s.closeAuto();
+                    s.spinCloseCommand();
                     follower.followPath(p.scoreTwo());
                     setPathState(4);
                 }
@@ -89,6 +90,7 @@ public class blueClose extends OpMode {
                 if (!follower.isBusy() && !s.isAutoActionRunning()){
                     follower.followPath(p.setTwo());
                     i.inCommand();
+                    s.intakein();
                     setPathState(5);
                 }
                 break;
@@ -101,7 +103,7 @@ public class blueClose extends OpMode {
             case 6:
                 if (!follower.isBusy() && actionTimer.getElapsedTime() > 1){
                     i.stopCommand();
-                    s.closeAuto();
+                    s.spinCloseCommand();
                     follower.followPath(p.scoreThird());
                     setPathState(7);
                 }
@@ -110,6 +112,7 @@ public class blueClose extends OpMode {
                 if (!follower.isBusy() && !s.isAutoActionRunning()){
                     follower.followPath(p.setThird());
                     i.inCommand();
+                    s.intakein();
                     setPathState(8);
                 }
                 break;
@@ -122,7 +125,7 @@ public class blueClose extends OpMode {
             case 9:
                 if (!follower.isBusy() && actionTimer.getElapsedTime() > 1){
                     i.stopCommand();
-                    s.closeAuto();
+                    s.spinCloseCommand();
                     follower.followPath(p.scoreFourth());
                     setPathState(10);
                 }
